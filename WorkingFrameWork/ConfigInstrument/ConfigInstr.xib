@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10116" systemVersion="17C88" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10116"/>
+        <capability name="box content view" minToolsVersion="7.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="ConfigInstr">
+            <connections>
+                <outlet property="PopButton_2987A" destination="6mZ-We-jYg" id="Pkx-KZ-YOt"/>
+                <outlet property="PopButton_2987B" destination="Etf-tf-xNm" id="Tpv-Gm-H5g"/>
+                <outlet property="PopButton_2987C" destination="LQG-2O-CGm" id="ifV-15-pFO"/>
+                <outlet property="PopButton_2987D" destination="Uej-GA-698" id="GBT-Fk-cX6"/>
+                <outlet property="PopButton_4980A" destination="i9l-p9-qbx" id="p37-ed-lLX"/>
+                <outlet property="PopButton_4980B" destination="3IW-Ie-fR3" id="ilP-is-3Dy"/>
+                <outlet property="PopButton_4980C" destination="JvV-ki-RUn" id="Yyz-54-7Hx"/>
+                <outlet property="PopButton_4980D" destination="6jo-3o-KFI" id="1Jx-bO-Wg3"/>
+                <outlet property="window" destination="F0z-JX-Cv5" id="gIp-Ho-8D9"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <window title="ConfigInstrument" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" animationBehavior="default" id="F0z-JX-Cv5">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
+            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+            <rect key="contentRect" x="196" y="240" width="516" height="476"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1057"/>
+            <view key="contentView" id="se5-gp-TjO">
+                <rect key="frame" x="0.0" y="0.0" width="516" height="476"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <box fixedFrame="YES" title="EW-FIX_A" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="GlR-vN-K2o">
+                        <rect key="frame" x="9" y="373" width="490" height="94"/>
+                        <view key="contentView" id="OiV-aR-518">
+                            <rect key="frame" x="1" y="1" width="488" height="78"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6mZ-We-jYg">
+                                    <rect key="frame" x="18" y="43" width="453" height="26"/>
+                                    <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="6aa-68-YXT">
+                                        <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="menu"/>
+                                        <menu key="menu" id="dhS-tt-JF1"/>
+                                    </popUpButtonCell>
+                                    <connections>
+                                        <action selector="show_2987A_Action:" target="-2" id="aqe-ae-1Lb"/>
+                                    </connections>
+                                </popUpButton>
+                                <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="i9l-p9-qbx">
+                                    <rect key="frame" x="18" y="12" width="453" height="26"/>
+                                    <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="wKj-OB-QTd">
+                                        <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="menu"/>
+                                        <menu key="menu" id="DMj-lD-5tH"/>
+                                    </popUpButtonCell>
+                                    <connections>
+                                        <action selector="show_4980_Action:" target="-2" id="M4t-Sd-rNt"/>
+                                    </connections>
+                                </popUpButton>
+                            </subviews>
+                        </view>
+                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    </box>
+                    <box fixedFrame="YES" title="EW-FIX_B" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="FvI-jF-CW1">
+                        <rect key="frame" x="9" y="275" width="490" height="94"/>
+                        <view key="contentView" id="tFA-eZ-rKb">
+                            <rect key="frame" x="1" y="1" width="488" height="78"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Etf-tf-xNm">
+                                    <rect key="frame" x="18" y="42" width="453" height="26"/>
+                                    <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="M23-Fl-Gfh">
+                                        <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="menu"/>
+                                        <menu key="menu" id="ofO-nH-eWo"/>
+                                    </popUpButtonCell>
+                                    <connections>
+                                        <action selector="show_2987A_Action:" target="-2" id="4Cd-Su-g5I"/>
+                                    </connections>
+                                </popUpButton>
+                                <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3IW-Ie-fR3">
+                                    <rect key="frame" x="18" y="6" width="453" height="26"/>
+                                    <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="KiJ-lI-Avr">
+                                        <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="menu"/>
+                                        <menu key="menu" id="Dei-Ch-0pH"/>
+                                    </popUpButtonCell>
+                                    <connections>
+                                        <action selector="show_4980_Action:" target="-2" id="ZvF-g2-Nuk"/>
+                                    </connections>
+                                </popUpButton>
+                            </subviews>
+                        </view>
+                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    </box>
+                    <box fixedFrame="YES" title="EW-FIX_C" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="TTJ-Sy-bVC">
+                        <rect key="frame" x="9" y="169" width="490" height="94"/>
+                        <view key="contentView" id="thx-0z-uot">
+                            <rect key="frame" x="1" y="1" width="488" height="78"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LQG-2O-CGm">
+                                    <rect key="frame" x="18" y="44" width="453" height="26"/>
+                                    <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="htK-rz-X46">
+                                        <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="menu"/>
+                                        <menu key="menu" id="uP0-11-Zek"/>
+                                    </popUpButtonCell>
+                                    <connections>
+                                        <action selector="show_2987A_Action:" target="-2" id="xsY-HT-UZp"/>
+                                    </connections>
+                                </popUpButton>
+                                <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="JvV-ki-RUn">
+                                    <rect key="frame" x="18" y="8" width="453" height="26"/>
+                                    <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="tHC-xK-Jxz">
+                                        <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="menu"/>
+                                        <menu key="menu" id="2Lc-9R-KYP"/>
+                                    </popUpButtonCell>
+                                    <connections>
+                                        <action selector="show_4980_Action:" target="-2" id="mnB-Q9-HDl"/>
+                                    </connections>
+                                </popUpButton>
+                            </subviews>
+                        </view>
+                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    </box>
+                    <box fixedFrame="YES" title="EW-FIX_D" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="Neq-0T-nfL">
+                        <rect key="frame" x="9" y="71" width="490" height="94"/>
+                        <view key="contentView" id="1W1-39-SJ5">
+                            <rect key="frame" x="1" y="1" width="488" height="78"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6jo-3o-KFI">
+                                    <rect key="frame" x="18" y="9" width="453" height="26"/>
+                                    <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="jmT-Mm-Bdh">
+                                        <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="menu"/>
+                                        <menu key="menu" id="hgU-WP-2qm"/>
+                                    </popUpButtonCell>
+                                    <connections>
+                                        <action selector="show_4980_Action:" target="-2" id="HcR-bE-FD0"/>
+                                    </connections>
+                                </popUpButton>
+                                <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Uej-GA-698">
+                                    <rect key="frame" x="18" y="40" width="453" height="26"/>
+                                    <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="Oh4-BC-mHT">
+                                        <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="menu"/>
+                                        <menu key="menu" id="L8x-Kr-D1Q"/>
+                                    </popUpButtonCell>
+                                    <connections>
+                                        <action selector="show_2987A_Action:" target="-2" id="0zx-Il-WXM"/>
+                                    </connections>
+                                </popUpButton>
+                            </subviews>
+                        </view>
+                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    </box>
+                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YSD-UY-ZqC">
+                        <rect key="frame" x="79" y="20" width="109" height="39"/>
+                        <buttonCell key="cell" type="square" title="Bind" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="8a7-ME-M7o">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" size="13" name=".PingFangSC-Regular"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="Bind_Fix_InStrument:" target="-2" id="ZOp-sd-cOQ"/>
+                        </connections>
+                    </button>
+                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5by-Ew-FBS">
+                        <rect key="frame" x="294" y="20" width="109" height="39"/>
+                        <buttonCell key="cell" type="square" title="Cancel" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Lli-PC-X0d">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="CancelandCloseWindow:" target="-2" id="ByB-Mw-Q61"/>
+                        </connections>
+                    </button>
+                </subviews>
+            </view>
+            <connections>
+                <outlet property="delegate" destination="-2" id="0bl-1N-AYu"/>
+            </connections>
+            <point key="canvasLocation" x="451" y="415"/>
+        </window>
+    </objects>
+</document>
