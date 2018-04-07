@@ -132,7 +132,7 @@
 -(BOOL) AddBlob:(NSString*) fileName FilePath:(NSString*) filePath
 {
     BOOL flag = NO;
-    //reply = IP_addBlob(UID, [fileName UTF8String], [filePath UTF8String]);
+    reply = IP_addBlob(UID, [fileName UTF8String], [filePath UTF8String]);
     
     if(IP_success(reply))
     {

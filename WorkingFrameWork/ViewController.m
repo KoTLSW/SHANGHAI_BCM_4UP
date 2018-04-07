@@ -21,6 +21,7 @@
 #import "Common.h"
 #import "TestStep.h"
 #import "BYDSFCManager.h"
+#import "ManagerPdca.h"
 
 
 //文件名称
@@ -47,6 +48,8 @@ NSString * param_Name = @"Param";
     TestAction * action2;
     TestAction * action3;
     TestAction * action4;
+    
+    ManagerPdca * pdca;               //上传PDCA
     
     //定时器相关
      MKTimer * mkTimer;
@@ -248,6 +251,7 @@ NSString * param_Name = @"Param";
     //上传相关文件
     testStep   = [TestStep Instance];
     sfcManager = [BYDSFCManager Instance];
+     pdca       = [[ManagerPdca alloc]init];
     
     //监听测试结束，重新等待SN
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(selectSnChangeNoti:) name:@"SNChangeNotice" object:nil];

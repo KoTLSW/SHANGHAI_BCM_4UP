@@ -98,7 +98,7 @@
 {
     NSDate* date = [NSDate date];
     NSDateFormatter* formatter = [[NSDateFormatter alloc] init];
-    [formatter setDateFormat:@"mm:ss:SSS"];
+    [formatter setDateFormat:@"mm_ss_SSS"];
     NSString* currentTime = [formatter stringFromDate:date];
     return currentTime;
 }

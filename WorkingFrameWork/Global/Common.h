@@ -69,6 +69,8 @@
 
 //选择测试
 #define kTest40DataNotice                   @"Test40DataNotice"
+//监听pdca传送的值
+#define kTestPDCAValueNotice                @"kTestPDCAValueNotice"
 
 
 

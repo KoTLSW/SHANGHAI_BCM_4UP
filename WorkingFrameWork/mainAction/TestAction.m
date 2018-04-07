@@ -29,6 +29,7 @@ NSString  *param_path=@"Param";
     NSMutableArray  *testItemMinLimitArr;                     //每个测试项最小值数组
     NSMutableArray  *testItesmMaxLimitArr;                    //每个测试项最大值数组
     NSMutableArray  *testItemUnitArr;
+    NSMutableArray  *TestItemArr;                             //软件测试总结果
 
     
     NSThread        * thread;                                   //开启的线程
@@ -81,6 +82,7 @@ NSString  *param_path=@"Param";
     
     //存储生成文件的具体地址
     NSString   * eachCsvDir;
+    NSString   * totalPath;
     NSString   * singleFloder;
     int          fix_type;
     
@@ -143,8 +145,9 @@ NSString  *param_path=@"Param";
         addDcr = NO;
         
         //初始化各类数组和可变字符串
-        ItemArr         = [[NSMutableArray alloc]initWithCapacity:10];
+        ItemArr         = [[NSMutableArray alloc] initWithCapacity:10];
         TestValueArr    = [[NSMutableArray alloc] initWithCapacity:10];
+        TestItemArr     = [[NSMutableArray  alloc] initWithCapacity:10];
         txtContentString=[[NSMutableString alloc]initWithCapacity:10];
         listFailItemString=[[NSMutableString alloc]initWithCapacity:10];
         ErrorMessageString=[[NSMutableString alloc]initWithCapacity:10];
@@ -393,6 +396,8 @@ NSString  *param_path=@"Param";
             
             BOOL isPass =[self TestItem:testItem];
             
+            [TestItemArr addObject:testItem];
+            
             if (isPass) {//测试成功
                 
                 [self UpdateTextView:[NSString stringWithFormat:@"index=4:%@ 测试OK",testItem.testName] andClear:NO andTextView:self.Log_View];
@@ -431,7 +436,7 @@ NSString  *param_path=@"Param";
             end_time = [[GetTimeDay shareInstance] getFileTime];
             [NSThread sleepForTimeInterval:0.2];
             NSString * path = [[NSUserDefaults standardUserDefaults] objectForKey:kTotalFoldPath];
-            NSString * totalPath  = [NSString stringWithFormat:@"%@/%@/%@",path,self.NestID,[self.Config_pro length]>0?self.Config_pro:@"NoConfig"];
+            totalPath  = [NSString stringWithFormat:@"%@/%@/%@",path,self.NestID,[self.Config_pro length]>0?self.Config_pro:@"NoConfig"];
             NSLog(@"打印总文件的位置%d=========%@",fix_type,totalPath);
             
             [fold Folder_Creat:totalPath];
@@ -470,7 +475,7 @@ NSString  *param_path=@"Param";
             {
                 //生成单个产品的value值csv文件
                 [NSThread sleepForTimeInterval:0.2];
-                eachCsvDir = [NSString stringWithFormat:@"%@/%@_%@",totalPath,self.dut_sn,[timeDay getCurrentMinuteAndSecond]];;
+                eachCsvDir = [NSString stringWithFormat:@"%@/%@_%@",totalPath,self.dut_sn,[timeDay getCurrentMinuteAndSecond]];
                 [fold Folder_Creat:eachCsvDir];
                 NSString * eachCsvFile = [NSString stringWithFormat:@"%@/%@_%@_%u.csv",eachCsvDir,self.dut_sn,end_time,arc4random()%100];
                 if (csv_file!=nil)
@@ -518,8 +523,25 @@ NSString  *param_path=@"Param";
             [self UpdateTextView:@"index=6,准备上传PDCA" andClear:NO andTextView:self.Log_View];
            if (isPDCA) {
                 
-              [self UploadPDCA];
-              NSLog(@"将数据上传到PDCA服务器");
+//             [self UploadPDCA];
+//              NSLog(@"将数据上传到PDCA服务器");
+               
+               NSMutableDictionary  * resultdic = [[NSMutableDictionary alloc]initWithCapacity:10];
+               [resultdic setObject:TestItemArr forKey:@"dic"];
+               [resultdic setObject:_dut_sn forKey:@"sn"];
+               [resultdic setObject:param.sw_ver  forKey:@"sw_ver"];
+               [resultdic setObject:param.sw_name forKey:@"sw_name"];
+               [resultdic setObject:eachCsvDir forKey:@"eachCsvDir"];
+               [resultdic setObject:totalPath forKey:@"totalPath"];
+               
+
+               
+               
+               
+               [[NSNotificationCenter defaultCenter] postNotificationName:kTestPDCAValueNotice object:[NSString stringWithFormat:@"%dP",fix_type] userInfo:resultdic];
+               
+            
+               
             }
             
             [txtContentString appendFormat:@"%@:index=6,准备上传SFC\n",[timeDay getFileTime]];
@@ -595,6 +617,7 @@ NSString  *param_path=@"Param";
             row_index = 0;
             PF = YES;
             [TestValueArr removeAllObjects];
+            [TestItemArr removeAllObjects];
             
         }
      
