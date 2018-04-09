@@ -23,7 +23,7 @@
 		<key>fixture_uart_baud</key>
 		<string>115200</string>
 		<key>fixture_uart_port_name</key>
-		<string>/dev/cu.usbserial-EW_FIX_A</string>
+		<string>/dev/cu.usbserial-EW-FIX-A</string>
 	</dict>
 	<key>Fix2</key>
 	<dict>
@@ -46,7 +46,7 @@
 		<key>fixture_uart_baud</key>
 		<string>115200</string>
 		<key>fixture_uart_port_name</key>
-		<string>/dev/cu.usbserial-EW_FIX_B</string>
+		<string>/dev/cu.usbserial-EW-FIX-B</string>
 	</dict>
 	<key>Fix3</key>
 	<dict>
@@ -69,7 +69,7 @@
 		<key>fixture_uart_baud</key>
 		<string>115200</string>
 		<key>fixture_uart_port_name</key>
-		<string>/dev/cu.usbserial-EW_FIX_C</string>
+		<string>/dev/cu.usbserial-EW-FIX-C</string>
 	</dict>
 	<key>Fix4</key>
 	<dict>
@@ -92,7 +92,7 @@
 		<key>fixture_uart_baud</key>
 		<string>115200</string>
 		<key>fixture_uart_port_name</key>
-		<string>/dev/cu.usbserial-EW_FIX_D</string>
+		<string>/dev/cu.usbserial-EW-FIX-D</string>
 	</dict>
 	<key>ServerFC</key>
 	<dict>
@@ -114,7 +114,7 @@
 		<string>AG</string>
 	</dict>
 	<key>contollerBoard</key>
-	<string>/dev/cu.usbserial-EW_FIX_O</string>
+	<string>/dev/cu.usbserial-EW-FIX-O</string>
 	<key>contollerBoard_uart_baud</key>
 	<string>115200</string>
 	<key>foldDir</key>
@@ -124,9 +124,9 @@
 	<key>humiture_uart_baud</key>
 	<string>115200</string>
 	<key>humiture_uart_port_name</key>
-	<string>/dev/cu.usbserial-EW_HUMIT</string>
+	<string>/dev/cu.usbserial-EW-HUMIT</string>
 	<key>isDebug</key>
-	<true/>
+	<false/>
 	<key>reading_borad</key>
 	<string>/dev/cu.usbserial-read</string>
 	<key>reading_uart_baud</key>
@@ -138,7 +138,7 @@
 	<key>sw_name</key>
 	<string>BCM_OQC_Station</string>
 	<key>sw_ver</key>
-	<string>V2.0.6TE</string>
+	<string>V2.0.1BCM</string>
 	<key>waveFrequence</key>
 	<string>1000</string>
 	<key>waveOffset</key>

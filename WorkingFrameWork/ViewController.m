@@ -156,8 +156,6 @@ NSString * param_Name = @"Param";
     //===================通过可变数组的大小，判断当前有几个在测试
     NSMutableArray            *ChooseNumArray; //测试个数
     //===================工位数据生成地址单独设置
-    BOOL                      isShowNestID_Change;
-    BOOL                      isUpLoadPDCA;
     BOOL                      isUpLoadSFC;
     BOOL                      isLoopTest;      //循环测试
     
@@ -199,11 +197,8 @@ NSString * param_Name = @"Param";
     
     //BOOL变量
     singleTest = NO;
-    isUpLoadSFC  = YES;
-    isUpLoadPDCA =  NO;
+    isUpLoadSFC  = NO;
     isLoopTest = NO;
-    //NestID 使用这个界面上的
-    isShowNestID_Change = YES;
     //新增内容
     testStep = [TestStep Instance];
     
@@ -241,29 +236,30 @@ NSString * param_Name = @"Param";
     csvFile = [[FileCSV alloc]init];
     
     //保存路径
-    totalPath = [NSString stringWithFormat:@"%@/%@/%@_%@/%@",param.foldDir,[[GetTimeDay shareInstance] getCurrentDay],param.sw_name,param.sw_ver,@"Cr"];
+    totalPath = [NSString stringWithFormat:@"%@/%@/%@_%@",param.foldDir,[[GetTimeDay shareInstance] getCurrentDay],param.sw_name,param.sw_ver];
     [[NSUserDefaults standardUserDefaults] setValue:totalPath forKey:kTotalFoldPath];
-    
-    [self creat_TotalFile];
 
 
     
     //上传相关文件
     testStep   = [TestStep Instance];
     sfcManager = [BYDSFCManager Instance];
-     pdca       = [[ManagerPdca alloc]init];
+    pdca       = [[ManagerPdca alloc]init];
+    if (IsUploadPDCA_Button.state) {
+        
+        [pdca start_Thread];
+    }
+    
     
     //监听测试结束，重新等待SN
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(selectSnChangeNoti:) name:@"SNChangeNotice" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(selectTestModeNotice:) name:kSingleTestNotice object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(selectTestModeNotice:) name:kNullTestNotice object:nil];
     [[NSNotificationCenter defaultCenter]  addObserver:self selector:@selector(selectTestModeNotice:) name:kLoopTestNotice object:nil];
-    [[NSNotificationCenter defaultCenter]  addObserver:self selector:@selector(selectSfc_PdcaUpload:) name:kSfcUploadNotice object:nil];
-    [[NSNotificationCenter defaultCenter]  addObserver:self selector:@selector(selectSfc_PdcaUpload:) name:kPdcaUploadNotice object:nil];
-    //监听NestID的改变
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(selectNestIDNotice:) name:kTestLargeConfigNotice object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(selectNestIDNotice:) name:kTestSmallConfigNotice object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(selectNestIDNotice:) name:kTestNoChangeNotice object:nil];
+    [[NSNotificationCenter defaultCenter]  addObserver:self selector:@selector(selectSfc_PDCAUpload:) name:kSfcUploadNotice object:nil];
+    [[NSNotificationCenter defaultCenter]  addObserver:self selector:@selector(selectSfc_PDCAUpload:) name:kPdcaUploadNotice object:nil];
+    
+
     
     
     //开启4条线程
@@ -305,18 +301,18 @@ NSString * param_Name = @"Param";
 
         [config_Dic setValue: NestID_Change.titleOfSelectedItem forKey:kProductNestID];
         
-        if ([NestID_Change.titleOfSelectedItem containsString:@"BC"]) {
-            
-            itemArr1 = [plist PlistRead:@"Station_Cr_1_Humid" Key:@"AllItems"];
-            tab1 = [tab1 init:Tab1_View DisplayData:itemArr1];
-            
-        }
-        else
-        {
-            itemArr1 = [plist PlistRead:@"Station_Cr_1_Humid" Key:@"WAllItems"];
-            tab1 =    [tab1 init:Tab1_View DisplayData:itemArr1];
-        
-        }
+//        if ([NestID_Change.titleOfSelectedItem containsString:@"BC"]) {
+//            
+//            itemArr1 = [plist PlistRead:@"Station_Cr_1_Humid" Key:@"AllItems"];
+//            tab1 = [tab1 init:Tab1_View DisplayData:itemArr1];
+//            
+//        }
+//        else
+//        {
+//            itemArr1 = [plist PlistRead:@"Station_Cr_1_Humid" Key:@"WAllItems"];
+//            tab1 =    [tab1 init:Tab1_View DisplayData:itemArr1];
+//        
+//        }
         
         
         
@@ -435,58 +431,6 @@ NSString * param_Name = @"Param";
     }
 
 }
-
-
-
-
-//发送通知，监听大小NestID变化
--(void)selectNestIDNotice:(NSNotification *)noti
-{
-    
-    if ([noti.name isEqualToString:kTestNoChangeNotice]) {
-        
-        isShowNestID_Change = YES;
-        
-        index = 3;
-    }
-    
-    if ([noti.name isEqualToString:kTestLargeConfigNotice]) {
-        
-        isShowNestID_Change = NO;
-        if (action1!=nil) {
-            [action1 setFoldDir:foldDir];
-            [action1 setNestID:noti.object];
-        }
-        if (action2!=nil) {
-           [action1 setFoldDir:foldDir];
-           [action2 setNestID:noti.object];
-        
-        }
-        
-    }
-    
-    if ([noti.name isEqualToString:kTestSmallConfigNotice]) {
-        
-         isShowNestID_Change = NO;
-        if (action3!=nil) {
-            [action3 setFoldDir:foldDir];
-            [action3 setNestID:noti.object];
-        }
-        if (action4!=nil) {
-            [action4 setFoldDir:foldDir];
-            [action4 setNestID:noti.object];
-        }
-        
-    }
-    
-
-    
-}
-
-
-
-
-
 
 
 //=============================================
@@ -851,7 +795,7 @@ NSString * param_Name = @"Param";
             else
             {
                 
-                if (isUpLoadPDCA) {
+                if (isUpLoadSFC) {
                     
                     [self compareSNToServerwithTextField:NS_TF3 Index:5 SnIndex:3];
                 }
@@ -970,36 +914,22 @@ NSString * param_Name = @"Param";
                 if (action1!=nil) {
                     action1.Config_Dic = [NSDictionary dictionaryWithDictionary:config_Dic];
                     action1.Config_pro = product_Config.stringValue;
-                    if (isShowNestID_Change) {
-                        action1.NestID     = NestID_Change.titleOfSelectedItem;
-                    }
-
-              
+                    action1.NestID     = NestID_Change.titleOfSelectedItem;
                 }
                 if (action2!=nil) {
                     action2.Config_Dic = [NSDictionary dictionaryWithDictionary:config_Dic];
                     action2.Config_pro = product_Config.stringValue;
-                    if (isShowNestID_Change) {
-                        action2.NestID     = NestID_Change.titleOfSelectedItem;
-                    }
+                    action2.NestID     = NestID_Change.titleOfSelectedItem;
                 }
                 if (action3!=nil) {
-                    
                     action3.Config_Dic = [NSDictionary dictionaryWithDictionary:config_Dic];
                     action3.Config_pro = product_Config.stringValue;
-                    if (isShowNestID_Change) {
-                        action3.NestID     = NestID_Change.titleOfSelectedItem;
-                    }
-                   
+                    action3.NestID     = NestID_Change.titleOfSelectedItem;
                 }
                 if (action4!=nil) {
-                    
                     action4.Config_Dic = [NSDictionary dictionaryWithDictionary:config_Dic];
                     action4.Config_pro = product_Config.stringValue;
-                    
-                    if (isShowNestID_Change) {
-                       action4.NestID     = NestID_Change.titleOfSelectedItem;
-                    }
+                    action4.NestID     = NestID_Change.titleOfSelectedItem;
                 }
                 
                 
@@ -1206,13 +1136,6 @@ NSString * param_Name = @"Param";
             
             [NSThread sleepForTimeInterval:0.3];
             testingFixStr = @"DSN4";
-            
-            if ([notiString_D containsString:@"P"]) {
-                
-                passNum++;
-            }
-
-            
             
             if (param.isDebug) {
                 NSLog(@"治具D测试完毕，灯光操作完成");
@@ -1464,7 +1387,7 @@ NSString * param_Name = @"Param";
 
 
 //PDCA和SFC的改变
--(void)selectSfc_PdcaUpload:(NSNotification *) noti
+-(void)selectSfc_PDCAUpload:(NSNotification *) noti
 {
     if ([noti.name isEqualToString:kPdcaUploadNotice]) {
         
@@ -1473,21 +1396,25 @@ NSString * param_Name = @"Param";
             dispatch_async(dispatch_get_main_queue(), ^{
                 
                 IsUploadPDCA_Button.state = YES;
-                isUpLoadPDCA = YES;
+                
             });
+            
+            [pdca start_Thread];
         }
         else
         {
             dispatch_async(dispatch_get_main_queue(), ^{
                 
                 IsUploadPDCA_Button.state = NO;
-                isUpLoadPDCA = NO;
+               
             });
             
+            [pdca end_Thread];
         }
         
-         NSLog(@"isUpLoadPDCA===%d",isUpLoadPDCA);
     }
+    
+    
     if ([noti.name isEqualToString:kSfcUploadNotice]) {
         
         if ([noti.object isEqualToString:@"YES"]) {
@@ -1510,12 +1437,7 @@ NSString * param_Name = @"Param";
             });
         }
         
-        NSLog(@"isUpLoadSFC===%d",isUpLoadSFC);
     }
-
-    
-
-
 }
 
 

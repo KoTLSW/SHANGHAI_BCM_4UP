@@ -11,13 +11,12 @@
                 <outlet property="PdcaUploadButton" destination="WwV-dt-A0t" id="bRa-9c-VpO"/>
                 <outlet property="SfcUploadButton" destination="Woq-pw-sdO" id="Yar-XE-vgQ"/>
                 <outlet property="Station_Large_config" destination="vP8-c9-f0t" id="WAT-DG-QzV"/>
-                <outlet property="Station_Small_config" destination="ag6-un-eu6" id="8wP-a0-deH"/>
                 <outlet property="cancelBtn" destination="NiP-eb-DBf" id="i33-7y-gJN"/>
                 <outlet property="config_button" destination="fUP-iC-AKj" id="we5-8z-i32"/>
                 <outlet property="enterBtn" destination="6TZ-7u-9T9" id="AL8-zF-vDv"/>
                 <outlet property="logInfo" destination="AEA-BD-YIY" id="U2b-4V-q3N"/>
                 <outlet property="nullTestButton" destination="0wO-SY-Nyb" id="cj0-aE-gHj"/>
-                <outlet property="passWord" destination="IHV-MQ-jsO" id="edm-l4-hdP"/>
+                <outlet property="passWord" destination="Rvf-jP-Ic4" id="5Pn-cu-wFq"/>
                 <outlet property="singleTestButton" destination="gUl-HM-gIh" id="zoS-ZP-L0b"/>
                 <outlet property="test_40_Data_button" destination="pGV-5Y-pIY" id="hTn-Ot-3Dn"/>
                 <outlet property="test_mode_button" destination="TUr-xG-jO8" id="lOA-Cp-oWa"/>
@@ -79,14 +78,6 @@
                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                         <font key="titleFont" metaFont="system" size="15"/>
                     </box>
-                    <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="IHV-MQ-jsO">
-                        <rect key="frame" x="107" y="117" width="284" height="30"/>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="lcA-2m-Rqx">
-                            <font key="font" metaFont="system"/>
-                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6TZ-7u-9T9">
                         <rect key="frame" x="107" y="47" width="100" height="39"/>
                         <buttonCell key="cell" type="square" title="Enter" bezelStyle="shadowlessSquare" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="JfD-ly-Yg3">
@@ -123,54 +114,29 @@
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <box fixedFrame="YES" title="Config选择" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="0em-BW-Tld">
+                    <box fixedFrame="YES" title="Company选择" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="0em-BW-Tld">
                         <rect key="frame" x="17" y="314" width="377" height="74"/>
                         <view key="contentView" id="GfW-G9-gZI">
                             <rect key="frame" x="1" y="1" width="375" height="52"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="JhA-cz-OCh">
-                                    <rect key="frame" x="13" y="20" width="68" height="18"/>
-                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="工位1和2:" id="m2a-8h-HfR">
-                                        <font key="font" size="13" name=".PingFangSC-Regular"/>
-                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                    </textFieldCell>
-                                </textField>
-                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Mpp-6H-rlV">
-                                    <rect key="frame" x="192" y="20" width="68" height="18"/>
-                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="工位3和4:" id="jqx-gl-QLj">
-                                        <font key="font" size="13" name=".PingFangSC-Regular"/>
+                                    <rect key="frame" x="13" y="22" width="68" height="18"/>
+                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="company:" id="m2a-8h-HfR">
+                                        <font key="font" size="14" name=".PingFangSC-Regular"/>
                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
                                 <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vP8-c9-f0t">
-                                    <rect key="frame" x="79" y="16" width="91" height="26"/>
-                                    <popUpButtonCell key="cell" type="push" title="WS" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" enabled="NO" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="8Yb-Am-IUe" id="MHb-ao-YhX">
+                                    <rect key="frame" x="85" y="15" width="91" height="26"/>
+                                    <popUpButtonCell key="cell" type="push" title="Beil" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" enabled="NO" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="8Yb-Am-IUe" id="MHb-ao-YhX">
                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="menu"/>
                                         <menu key="menu" id="jQX-cr-KET">
                                             <items>
-                                                <menuItem title="WL" id="0FX-aR-D47"/>
-                                                <menuItem title="WS" state="on" id="8Yb-Am-IUe"/>
-                                                <menuItem title="WL+BC" id="cVo-0y-fUW"/>
-                                                <menuItem title="WS+BC" id="I6K-NR-yU5"/>
-                                            </items>
-                                        </menu>
-                                    </popUpButtonCell>
-                                </popUpButton>
-                                <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ag6-un-eu6">
-                                    <rect key="frame" x="257" y="16" width="91" height="26"/>
-                                    <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" enabled="NO" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="Pfm-lN-TWS">
-                                        <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="menu"/>
-                                        <menu key="menu" id="QXR-kK-laW">
-                                            <items>
-                                                <menuItem title="WS" id="0zA-5V-MxJ"/>
-                                                <menuItem title="WL" id="5hj-2p-kZy"/>
-                                                <menuItem title="WS+BC" id="N1k-Ny-W9n"/>
-                                                <menuItem title="WL+BC" id="aYM-zp-24X"/>
+                                                <menuItem title="Beil" id="8Yb-Am-IUe"/>
+                                                <menuItem title="Lan" id="mfh-tL-ayn"/>
                                             </items>
                                         </menu>
                                     </popUpButtonCell>
@@ -189,14 +155,14 @@
                             <subviews>
                                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Woq-pw-sdO">
                                     <rect key="frame" x="18" y="13" width="102" height="32"/>
-                                    <buttonCell key="cell" type="check" title="SfcUpload" bezelStyle="regularSquare" imagePosition="left" alignment="center" enabled="NO" state="on" inset="2" id="ezI-4x-hjL">
+                                    <buttonCell key="cell" type="check" title="SfcUpload" bezelStyle="regularSquare" imagePosition="left" alignment="center" enabled="NO" inset="2" id="ezI-4x-hjL">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="system"/>
                                     </buttonCell>
                                 </button>
                                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="WwV-dt-A0t">
                                     <rect key="frame" x="170" y="13" width="102" height="32"/>
-                                    <buttonCell key="cell" type="check" title="PdcaUpload" bezelStyle="regularSquare" imagePosition="left" alignment="center" enabled="NO" inset="2" id="lUp-tb-t56">
+                                    <buttonCell key="cell" type="check" title="PdcaUpload" bezelStyle="regularSquare" imagePosition="left" alignment="center" enabled="NO" state="on" inset="2" id="lUp-tb-t56">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="system"/>
                                     </buttonCell>
@@ -237,7 +203,7 @@
                     </button>
                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fUP-iC-AKj">
                         <rect key="frame" x="343" y="369" width="65" height="25"/>
-                        <buttonCell key="cell" type="check" title="Cfig" bezelStyle="regularSquare" imagePosition="left" inset="2" id="AlQ-Yg-DeG">
+                        <buttonCell key="cell" type="check" title="Com" bezelStyle="regularSquare" imagePosition="left" inset="2" id="AlQ-Yg-DeG">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
@@ -282,6 +248,17 @@
                             <color key="backgroundColor" red="0.90196079019999997" green="0.90196079019999997" blue="0.90196079019999997" alpha="1" colorSpace="calibratedRGB"/>
                         </textFieldCell>
                     </textField>
+                    <secureTextField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Rvf-jP-Ic4">
+                        <rect key="frame" x="107" y="116" width="284" height="32"/>
+                        <secureTextFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" usesSingleLineMode="YES" id="08m-2T-fl1">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            <allowedInputSourceLocales>
+                                <string>NSAllRomanInputSourcesLocaleIdentifier</string>
+                            </allowedInputSourceLocales>
+                        </secureTextFieldCell>
+                    </secureTextField>
                 </subviews>
             </view>
             <connections>

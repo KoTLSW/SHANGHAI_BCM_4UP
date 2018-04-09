@@ -76,7 +76,6 @@ NSString  *param_path=@"Param";
     
     //检测PDCA和SFC的BOOL//测试结果PASS、FAIL
     BOOL      isPDCA;
-    BOOL      isSFC;
     PDCA    *  pdca;
     BOOL       PF;
     
@@ -106,6 +105,7 @@ NSString  *param_path=@"Param";
     BOOL                   is_JDY_Collect;                       //静电仪是否连接
     NSMutableString               * dcrAppendString;             //DCR拼接的数据
     BOOL                   addDcr;                               //40组DCR数据
+    NSString               * companyName;                        //公司名称
    
     
 }
@@ -140,9 +140,11 @@ NSString  *param_path=@"Param";
         B4_E4_Sum    = 0;
         ABC_DEF_Sum  = 0;
         Cap_Sum      = 0;
+        companyName  = @"Beil";
         
         PF =  YES;
         addDcr = NO;
+        isPDCA = YES;
         
         //初始化各类数组和可变字符串
         ItemArr         = [[NSMutableArray alloc] initWithCapacity:10];
@@ -212,15 +214,16 @@ NSString  *param_path=@"Param";
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(NSThreadEnd_Notification:) name:@"NSThreadEnd_Notification" object:nil];
         //监听空测试
         [[NSNotificationCenter defaultCenter]  addObserver:self selector:@selector(selectNullTestNoti:) name:kNullTestNotice object:nil];
-        //监听PDCA
-         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(selectPDCAandSCFNoti:) name:kPdcaUploadNotice object:nil];
-        //监听SFC
-         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(selectPDCAandSCFNoti:) name:kSfcUploadNotice object:nil];
         //写入空测的值
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(writeNullValueToPlist:) name:@"WriteNullValue" object:nil];
         //Test数据选择
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(selectTestDataNoti:) name:kTest40DataNotice object:nil];
         
+        //监听公司名称的变化
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(selectCompanyNotice:) name:kTestLargeConfigNotice object:nil];
+        
+        //监听上传PDCA的值
+        [[NSNotificationCenter defaultCenter]  addObserver:self selector:@selector(selectPDCANoti:) name:kPdcaUploadNotice object:nil];
         
         
 
@@ -375,7 +378,8 @@ NSString  *param_path=@"Param";
                 index = 4;//进入正常测试中
                 //开启PDCA的时间
                 if (isPDCA) {
-                    [pdca PDCA_GetStartTime];
+                    
+                    [[NSNotificationCenter defaultCenter] postNotificationName:kTestPDCAValueNotice object:@"start time" userInfo:nil];
                 }
                 
             }
@@ -432,15 +436,16 @@ NSString  *param_path=@"Param";
         
 #pragma mark--------生成本地数据
         if (index == 5) {
+            
            //测试结束的时间,csv里面用
             end_time = [[GetTimeDay shareInstance] getFileTime];
             [NSThread sleepForTimeInterval:0.2];
             NSString * path = [[NSUserDefaults standardUserDefaults] objectForKey:kTotalFoldPath];
-            totalPath  = [NSString stringWithFormat:@"%@/%@/%@",path,self.NestID,[self.Config_pro length]>0?self.Config_pro:@"NoConfig"];
+            totalPath  = [NSString stringWithFormat:@"%@/%@/%@/%@",path,companyName,self.NestID,[self.Config_pro length]>0?self.Config_pro:@"NoConfig"];
             NSLog(@"打印总文件的位置%d=========%@",fix_type,totalPath);
             
             [fold Folder_Creat:totalPath];
-            NSString   * configCSV = [self backTotalFilePathwithFloder:totalPath];
+             NSString   * configCSV = [self backTotalFilePathwithFloder:totalPath];
             
             if (total_file!=nil) {
                 
@@ -477,7 +482,7 @@ NSString  *param_path=@"Param";
                 [NSThread sleepForTimeInterval:0.2];
                 eachCsvDir = [NSString stringWithFormat:@"%@/%@_%@",totalPath,self.dut_sn,[timeDay getCurrentMinuteAndSecond]];
                 [fold Folder_Creat:eachCsvDir];
-                NSString * eachCsvFile = [NSString stringWithFormat:@"%@/%@_%@_%u.csv",eachCsvDir,self.dut_sn,end_time,arc4random()%100];
+                 NSString * eachCsvFile = [NSString stringWithFormat:@"%@/%@_%@_%u.csv",eachCsvDir,self.dut_sn,end_time,arc4random()%100];
                 if (csv_file!=nil)
                 {
                     BOOL need_title = [csv_file CSV_Open:eachCsvFile];
@@ -512,19 +517,14 @@ NSString  *param_path=@"Param";
 #pragma mark--------上传PDCA和SFC
         if (index == 6)
         {
-            //PDCA测试结束
-            if (isPDCA) {
-                [pdca PDCA_GetEndTime];
-            }
+           
             
             //上传PDCA和SFC
             [NSThread sleepForTimeInterval:0.3];
             [txtContentString appendFormat:@"%@:index=6,准备上传PDCA\n",[timeDay getFileTime]];
             [self UpdateTextView:@"index=6,准备上传PDCA" andClear:NO andTextView:self.Log_View];
            if (isPDCA) {
-                
-//             [self UploadPDCA];
-//              NSLog(@"将数据上传到PDCA服务器");
+               
                
                NSMutableDictionary  * resultdic = [[NSMutableDictionary alloc]initWithCapacity:10];
                [resultdic setObject:TestItemArr forKey:@"dic"];
@@ -533,19 +533,12 @@ NSString  *param_path=@"Param";
                [resultdic setObject:param.sw_name forKey:@"sw_name"];
                [resultdic setObject:eachCsvDir forKey:@"eachCsvDir"];
                [resultdic setObject:totalPath forKey:@"totalPath"];
-               
-
-               
-               
-               
                [[NSNotificationCenter defaultCenter] postNotificationName:kTestPDCAValueNotice object:[NSString stringWithFormat:@"%dP",fix_type] userInfo:resultdic];
-               
-            
-               
             }
             
             [txtContentString appendFormat:@"%@:index=6,准备上传SFC\n",[timeDay getFileTime]];
             [self UpdateTextView:@"index=6,准备上传SFC" andClear:NO andTextView:self.Log_View];
+            
 
             
             index = 7;
@@ -571,7 +564,7 @@ NSString  *param_path=@"Param";
                if (PF)
                {
                    
-                 [self.resultTF setTextColor:[NSColor greenColor]];
+                  [self.resultTF setTextColor:[NSColor greenColor]];
                    
                     NSMutableDictionary  * resultdic = [[NSMutableDictionary alloc]initWithCapacity:10];
                    [resultdic setObject:TestValueArr forKey:@"dic"];
@@ -1210,7 +1203,7 @@ NSString  *param_path=@"Param";
    
 }
 
--(void)selectPDCAandSCFNoti:(NSNotification *)noti
+-(void)selectPDCANoti:(NSNotification *)noti
 {
     
     if ([noti.name isEqualToString:kPdcaUploadNotice]) {
@@ -1224,25 +1217,10 @@ NSString  *param_path=@"Param";
             isPDCA = NO;
         }
     }
-    if ([noti.name isEqualToString:kSfcUploadNotice]) {
-       
-        if ([noti.object isEqualToString:@"YES"]) {
-            
-            isSFC = YES;
-        }
-        else
-        {
-            isSFC = NO;
-        }
-    }
-    
-    NSLog(@"%hhd======%hhd",isPDCA,isSFC);
 }
 
 -(void)writeNullValueToPlist:(NSNotification *)noti
 {
-    
-    
     updateItem.fix_B_E_Res     = [NSString stringWithFormat:@"%f",B_E_Sum/nullTimes];
     updateItem.fix_B2_E2_Res   = [NSString stringWithFormat:@"%f",B2_E2_Sum/nullTimes];
     updateItem.fix_B4_E4_Res   = [NSString stringWithFormat:@"%f",B4_E4_Sum/nullTimes];
@@ -1289,107 +1267,16 @@ NSString  *param_path=@"Param";
 }
 
 
-#pragma mark----PDCA相关
-//================================================
-//上传pdca
-//================================================
--(void)UploadPDCA
-{
-    //可以从json文件中获取所需要的值
-    NSString * result=  @"";
-    NSString * value =  @"";
-    
-    [pdca PDCA_Init:self.dut_sn SW_name:self.sw_name SW_ver:self.sw_ver];   //上传sn，sw_name,sw_ver
-    
-    for(int i=0;i<[ItemArr count];i++)
-    {
-        Item *testitem=ItemArr[i];
-        
-        
-        
-        if (fix_type == 1) {result = testitem.result1,value   =testitem.value1;}
-        if (fix_type == 2) {result = testitem.result1,value   =testitem.value2;}
-        if (fix_type == 3) {result = testitem.result1,value =testitem.value3;}
-        if (fix_type == 4) {result = testitem.result1,value  =testitem.value4;}
-        
-        
-        if(testitem.isTest)  //需要测试的才需要上传
-        {
-            
-            if((testitem.isShow == YES)&&(testitem.isTest))    //需要显示并且需要测试的才上传
-            {
-                
-                BOOL pass_fail=YES;
-                
-                if( ![result isEqualToString:@"PASS"] )
-                {
-                    pass_fail = NO;
-                    
-                }
-                
-                [pdca PDCA_UploadValue:testitem.testName
-                                 Lower:testitem.min
-                                 Upper:testitem.max
-                                  Unit:testitem.units
-                                 Value:value
-                             Pass_Fail:pass_fail
-                 ];
-                
-                
-            }
-        }
-    }
-    
-    [pdca PDCA_Upload:PF];     //上传汇总结果
-    
-    //============================压缩文件======================================/
-    NSTask *task;
-    task = [[NSTask alloc] init];
-    [task setLaunchPath:@"/bin/sh"];
-    
-    
-    NSString  * zipFileName = [[eachCsvDir componentsSeparatedByString:@"/"] lastObject];
-    NSString *cmd = [NSString stringWithFormat:@"cd %@; zip -rm %@.zip %@",self.foldDir,zipFileName,zipFileName];
-    NSArray *argument = [NSArray arrayWithObjects:@"-c", [NSString stringWithFormat:@"%@", cmd], nil];
-    [task setArguments: argument];
-    
-    NSPipe *pipe;
-    pipe = [NSPipe pipe];
-    [task setStandardOutput: pipe];
-    
-    [task launch];
-    
-    
-    
-    //获取压缩文件的具体地址
-     NSString *ZIP_path = [NSString stringWithFormat:@"%@/%@.zip",self.foldDir,zipFileName];
-    sleep(1);
-    int FileCount = 0;
-    while (true) {
-        
-        if([[NSFileManager defaultManager] fileExistsAtPath:ZIP_path]){
-            
-            NSLog(@"file has been existed");
-            break;
-        }
-        else
-        {
-            NSLog(@"file has been not existed");
-            FileCount++;
-            sleep(0.5);
-            if (FileCount>=3) {
-                break;
-            }
-            
-        }
-        
-    }
 
-    //上传压缩文件到服务器
-    [pdca AddBlob:zipFileName FilePath:ZIP_path];
-    //============================压缩文件======================================/
+#pragma mark--------------监听公司名称的改变
+-(void)selectCompanyNotice:(NSNotification *)noti
+{
+  
+    companyName = noti.object;
  
 }
+
+
 
 
 #pragma mark-----------------多次测试和的值

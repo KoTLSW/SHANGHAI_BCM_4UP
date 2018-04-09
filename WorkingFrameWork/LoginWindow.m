@@ -25,7 +25,6 @@
     
     IBOutlet NSPopUpButton *Station_Large_config;
     
-    IBOutlet NSPopUpButton *Station_Small_config;
     
     
     IBOutlet NSButton *test_mode_button;  
@@ -53,6 +52,8 @@
     [super windowDidLoad];
     
     // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
+    
+    
 }
 
 
@@ -131,6 +132,26 @@
         }
         
         
+        if (config_button.state) {
+            
+            if (Station_Large_config.acceptsFirstResponder) {
+                
+                  [[NSNotificationCenter defaultCenter] postNotificationName:kTestLargeConfigNotice object:Station_Large_config.titleOfSelectedItem];
+            }
+            
+        }
+        
+        if (test_40_Data_button.state) {
+            
+             [[NSNotificationCenter defaultCenter] postNotificationName:kTest40DataNotice object:@"YES"];
+        }
+        else
+        {
+             [[NSNotificationCenter defaultCenter] postNotificationName:kTest40DataNotice object:@"NO"];
+        }
+        
+        
+        
         if (updata_Button.state) {
             
             if (SfcUploadButton.state) {
@@ -143,43 +164,21 @@
             }
             if (PdcaUploadButton.state) {
                 
+                [self.window orderOut:self];
+                
                 [[NSNotificationCenter defaultCenter] postNotificationName:kPdcaUploadNotice object:@"YES"];
             }
             else
             {
+                [self.window orderOut:self];
+                
                 [[NSNotificationCenter defaultCenter] postNotificationName:kPdcaUploadNotice object:@"NO"];
                 
             }
-        }
-        
-        
-        if (config_button.state) {
             
-            if (Station_Large_config.acceptsFirstResponder) {
-                
-                  [[NSNotificationCenter defaultCenter] postNotificationName:kTestLargeConfigNotice object:Station_Large_config.titleOfSelectedItem];
-            }
-            
-            if (Station_Small_config.acceptsFirstResponder) {
-                
-                [[NSNotificationCenter defaultCenter] postNotificationName:kTestSmallConfigNotice object:Station_Small_config.titleOfSelectedItem];
-            }
             
         }
-        else
-        {
-              [[NSNotificationCenter defaultCenter] postNotificationName:kTestNoChangeNotice object:nil];
-        
-        }
-        
-        if (test_40_Data_button.state) {
-            
-             [[NSNotificationCenter defaultCenter] postNotificationName:kTest40DataNotice object:@"YES"];
-        }
-        else
-        {
-             [[NSNotificationCenter defaultCenter] postNotificationName:kTest40DataNotice object:@"NO"];
-        }
+
         
         [self.window orderOut:self];
     }
@@ -226,16 +225,15 @@
         }
     }
     
-    if ([button.title isEqualToString:@"Cfig"]) {
+    if ([button.title isEqualToString:@"Com"]) {
         
         if (button.state) {
+            
             Station_Large_config.enabled = YES;
-            Station_Small_config.enabled = YES;
         }
         else
         {
             Station_Large_config.enabled = NO;
-            Station_Small_config.enabled = NO;
         }
     }
     

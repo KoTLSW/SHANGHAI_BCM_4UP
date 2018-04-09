@@ -11,4 +11,8 @@
 @interface ManagerPdca : NSObject
 
 
+-(void)start_Thread;
+
+-(void)end_Thread;
+
 @end

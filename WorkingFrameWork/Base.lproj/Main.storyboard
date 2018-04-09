@@ -614,14 +614,14 @@
                                             <subviews>
                                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8Tw-iK-Cp9">
                                                     <rect key="frame" x="170" y="13" width="133" height="19"/>
-                                                    <buttonCell key="cell" type="check" title="isUpLoadSFC" bezelStyle="regularSquare" imagePosition="left" alignment="center" enabled="NO" state="on" inset="2" id="zYg-Sh-Uoa">
+                                                    <buttonCell key="cell" type="check" title="isUpLoadSFC" bezelStyle="regularSquare" imagePosition="left" alignment="center" enabled="NO" inset="2" id="zYg-Sh-Uoa">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system" size="15"/>
                                                     </buttonCell>
                                                 </button>
                                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CPz-jd-kHA">
                                                     <rect key="frame" x="12" y="13" width="135" height="19"/>
-                                                    <buttonCell key="cell" type="check" title="IsUpLoadPDCA" bezelStyle="regularSquare" imagePosition="left" alignment="center" enabled="NO" inset="2" id="PWZ-eh-b6A">
+                                                    <buttonCell key="cell" type="check" title="IsUpLoadPDCA" bezelStyle="regularSquare" imagePosition="left" alignment="center" enabled="NO" state="on" inset="2" id="PWZ-eh-b6A">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system" size="15"/>
                                                     </buttonCell>
