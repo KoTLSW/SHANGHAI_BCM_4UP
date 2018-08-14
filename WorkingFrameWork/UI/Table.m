@@ -165,8 +165,8 @@
     
     if (fixtype == 1)
     {
-         BOOL ispass1 = NO;
-         if([item.result1 isEqualToString:@"PASS"])ispass1=YES;
+        BOOL ispass1 = NO;
+        if([item.result1 isEqualToString:@"PASS"])ispass1=YES;
         NSDictionary* color1 = [NSDictionary dictionaryWithObjectsAndKeys:ispass1?[NSColor greenColor]:[NSColor redColor],NSForegroundColorAttributeName, nil];
         NSAttributedString* result1 = [[NSAttributedString alloc] initWithString:ispass1?@"  PASS":@"  FAIL" attributes:color1];
         [[_arrayDataSource objectAtIndex:rowIndex] setValue:item.value1       forKey:TABLE_COLUMN_VALUE_1];

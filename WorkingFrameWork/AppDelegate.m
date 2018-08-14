@@ -9,6 +9,7 @@
 #import "AppDelegate.h"
 #import "LoginWindow.h"
 #import "ConfigInstr.h"
+#import "Common.h"
 
 @interface AppDelegate ()
 {
@@ -46,8 +47,15 @@
     }
     
     [configInstrWindow showWindow:self];
+}
+
+
+- (IBAction)NullTestAction:(id)sender {
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:kTestModeNotice object:@"NullTest"];
     
 }
+
 
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification

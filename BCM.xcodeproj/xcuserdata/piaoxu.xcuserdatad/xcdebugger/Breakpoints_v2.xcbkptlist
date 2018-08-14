@@ -9,14 +9,14 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "WorkingFrameWork/LoginWindow.m"
-            timestampString = "549270253.028852"
+            filePath = "WorkingFrameWork/ViewController.m"
+            timestampString = "553674960.696633"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "96"
-            endingLineNumber = "96"
-            landmarkName = "-clickToLogin:"
-            landmarkType = "5">
+            startingLineNumber = "1096"
+            endingLineNumber = "1096"
+            landmarkName = "-Working"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

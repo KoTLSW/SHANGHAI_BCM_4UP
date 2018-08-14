@@ -4,7 +4,7 @@
 //
 //  Created by mac on 2017/10/27.
 //  Copyright © 2017年 macjinlongpiaoxu. All rights reserved.
-//
+// FGQ8152C1REJ68Y10
 
 #import "ViewController.h"
 #import "Table.h"
@@ -22,6 +22,7 @@
 #import "TestStep.h"
 #import "BYDSFCManager.h"
 #import "ManagerPdca.h"
+#import "Alert.h"
 
 
 //文件名称
@@ -49,6 +50,8 @@ NSString * param_Name = @"Param";
     TestAction * action3;
     TestAction * action4;
     
+    
+     Alert      *   alert;            //显示窗口
     ManagerPdca * pdca;               //上传PDCA
     
     //定时器相关
@@ -60,7 +63,6 @@ NSString * param_Name = @"Param";
     IBOutlet NSTextField *NS_TF1;                     //产品1输入框
     IBOutlet NSTextField *NS_TF2;                     //产品2输入框
     IBOutlet NSTextField *NS_TF3;                     //产品3输入框
-    
     IBOutlet NSTextField *NS_TF4;                     //产品4输入框
     
     
@@ -74,6 +76,7 @@ NSString * param_Name = @"Param";
     IBOutlet NSButton    *  IsUploadSFC_Button;       //上传SFC的按钮
     IBOutlet NSTextField *  Version_TF;               //软件版本
     
+    IBOutlet NSPopUpButtonCell *comanyItem;
     
     
     IBOutlet NSTextView *A_LOG_TF;
@@ -126,13 +129,13 @@ NSString * param_Name = @"Param";
     //产品通过的的次数和测试的总数
     int                   passNum;             //通过的测试次数
     int                   totalNum;            //通过的测试总数
+    int                   nullNum;             //空测试完成的次数
     int                   fix_A_num;
     int                   fix_B_num;
     int                   fix_C_num;
     int                   fix_D_num;
   
-    
-    
+
     
     int                   testnum;            //传送过来产品的总个数
 
@@ -157,16 +160,14 @@ NSString * param_Name = @"Param";
     NSMutableArray            *ChooseNumArray; //测试个数
     //===================工位数据生成地址单独设置
     BOOL                      isUpLoadSFC;
+    BOOL                      isUpLoadPDCA;
+    
     BOOL                      isLoopTest;      //循环测试
-    
-    
-    
-    
-    
-    
-    
+    BOOL                      isComfirmOK;     //单个模式选项是否确认
     
 }
+
+
 
 @end
 
@@ -179,13 +180,14 @@ NSString * param_Name = @"Param";
 - (void)viewDidLoad {
     [super viewDidLoad];
     //测试区
-    
+
     
     
     //整型变量定义区
     index    = 0;
     passNum  = 0;
     totalNum = 0;
+    nullNum  = 0;
     
     fix_A_num = 0;
     fix_B_num = 0;
@@ -193,12 +195,12 @@ NSString * param_Name = @"Param";
     fix_D_num = 0;
     testnum   = 0;
     testingFixStr = @"";
-    
-    
     //BOOL变量
-    singleTest = NO;
+    singleTest   = NO;
     isUpLoadSFC  = NO;
-    isLoopTest = NO;
+    isUpLoadPDCA = YES;
+    isLoopTest   = NO;
+    isComfirmOK  = NO;
     //新增内容
     testStep = [TestStep Instance];
     
@@ -214,20 +216,25 @@ NSString * param_Name = @"Param";
     [Version_TF setStringValue:param.sw_ver];
     
     
+     alert       = [Alert shareInstance];
     //第一响应
     [NS_TF1 acceptsFirstResponder];
     //加载界面
     itemArr1 = [plist PlistRead:@"Station_Cr_1_Humid" Key:@"AllItems"];
     tab1 = [[Table  alloc]init:Tab1_View DisplayData:itemArr1];
+    alert = [Alert shareInstance];
     
     //初始化温湿度和主控板
      humiturePort = [[SerialPort alloc]init];
     [humiturePort setTimeout:1 WriteTimeout:1];
      serialport   = [[SerialPort alloc]init];
     [serialport setTimeout:1 WriteTimeout:1];
-
-    
-    
+ 
+    //软件初始化
+    A_resultDic = [[NSDictionary alloc]init];
+    B_resultDic = [[NSDictionary alloc]init];
+    C_resultDic = [[NSDictionary alloc]init];
+    D_resultDic = [[NSDictionary alloc] init];
     
     //开启定时器
     mkTimer = [[MKTimer alloc]init];
@@ -237,7 +244,9 @@ NSString * param_Name = @"Param";
     
     //保存路径
     totalPath = [NSString stringWithFormat:@"%@/%@/%@_%@",param.foldDir,[[GetTimeDay shareInstance] getCurrentDay],param.sw_name,param.sw_ver];
+    [fold Folder_Creat:totalPath];
     [[NSUserDefaults standardUserDefaults] setValue:totalPath forKey:kTotalFoldPath];
+    [[NSUserDefaults standardUserDefaults] synchronize];
 
 
     
@@ -245,21 +254,15 @@ NSString * param_Name = @"Param";
     testStep   = [TestStep Instance];
     sfcManager = [BYDSFCManager Instance];
     pdca       = [[ManagerPdca alloc]init];
-    if (IsUploadPDCA_Button.state) {
-        
-        [pdca start_Thread];
-    }
-    
     
     //监听测试结束，重新等待SN
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(selectSnChangeNoti:) name:@"SNChangeNotice" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(selectTestModeNotice:) name:kSingleTestNotice object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(selectTestModeNotice:) name:kNullTestNotice object:nil];
-    [[NSNotificationCenter defaultCenter]  addObserver:self selector:@selector(selectTestModeNotice:) name:kLoopTestNotice object:nil];
-    [[NSNotificationCenter defaultCenter]  addObserver:self selector:@selector(selectSfc_PDCAUpload:) name:kSfcUploadNotice object:nil];
-    [[NSNotificationCenter defaultCenter]  addObserver:self selector:@selector(selectSfc_PDCAUpload:) name:kPdcaUploadNotice object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(selectTestModeNotice:) name:kTestModeNotice object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(selectSfc_PDCAUpload:) name:kSfcUploadNotice object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(selectSfc_PDCAUpload:) name:kPdcaUploadNotice object:nil];
+    //监测空测试完
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(selectFinshNullTest) name:kFinshNullTestNotice object:nil];
     
-
     
     
     //开启4条线程
@@ -269,9 +272,11 @@ NSString * param_Name = @"Param";
     [self createThreadWithNum:4];
 
     
-    thread = [[NSThread alloc] initWithTarget:self selector:@selector(Working) object:nil];
-    [thread start];
-
+    //是否绑定过
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@"IsBind"]) {
+        thread = [[NSThread alloc] initWithTarget:self selector:@selector(Working) object:nil];
+        [thread start];
+    }
 }
 
 
@@ -283,91 +288,24 @@ NSString * param_Name = @"Param";
     if ([sender isEqual:NestID_Change]) {
         
         NSLog(@"点击 NestID_Change");
-        
-        [self creat_TotalFile];
-        
-        if (action1!=nil) {
-            [action1 setFoldDir:foldDir];
-        }
-        if (action2!=nil) {
-            [action2 setFoldDir:foldDir];
-        }
-        if (action3!=nil) {
-            [action3 setFoldDir:foldDir];
-        }
-        if (action4!=nil) {
-            [action4 setFoldDir:foldDir];
-        }
 
         [config_Dic setValue: NestID_Change.titleOfSelectedItem forKey:kProductNestID];
-        
-//        if ([NestID_Change.titleOfSelectedItem containsString:@"BC"]) {
-//            
-//            itemArr1 = [plist PlistRead:@"Station_Cr_1_Humid" Key:@"AllItems"];
-//            tab1 = [tab1 init:Tab1_View DisplayData:itemArr1];
-//            
-//        }
-//        else
-//        {
-//            itemArr1 = [plist PlistRead:@"Station_Cr_1_Humid" Key:@"WAllItems"];
-//            tab1 =    [tab1 init:Tab1_View DisplayData:itemArr1];
-//        
-//        }
-        
-        
-        
     }
-    if ([sender isEqual:config_change]) {
+    
+    if ([sender isEqual:config_change])
+    {
         
-        if (config_change.state) {
-            
+        if (config_change.state)
+        {
             product_Config.editable = YES;
         }
         else
         {
             product_Config.editable = NO;
-        
-        }
-    
-        
-        
-        
-        if ([product_Config.stringValue length]>0) {
-         
-            [self creat_TotalFile];
-            
-            if (action1!=nil) {
-                [action1 setFoldDir:foldDir];
-            }
-            if (action2!=nil) {
-                [action2 setFoldDir:foldDir];
-            }
-            if (action3!=nil) {
-                [action3 setFoldDir:foldDir];
-            }
-            if (action4!=nil) {
-                 [action4 setFoldDir:foldDir];
-            }
-            
-        }
-        
-        [config_Dic setValue: product_Config.stringValue forKey:kConfig_pro];
-       
-    }
-    if ([sender isEqual:change_OpID]) {
-        
-        if (change_OpID.state) {
-           
-            Operator_TF.editable = YES;
-        }
-        else
-        {
-            Operator_TF.editable = NO;
-         
         }
 
+        [config_Dic setValue: product_Config.stringValue forKey:kConfig_pro];
        
-        [config_Dic setValue: Operator_TF.stringValue forKey:kOperator_ID];
     }
 }
 
@@ -382,12 +320,37 @@ NSString * param_Name = @"Param";
 }
 
 
-- (IBAction)start_Action:(id)sender {//发送通知开始测试
+#pragma mark=======================开始测试
+- (IBAction)start_Action:(id)sender
+{
     
-    startbutton.enabled = NO;
+    if (singleTest) {
+        
+        if (isComfirmOK) {
+            
+            index = 8;
+            startbutton.enabled = NO;
+        }
+        else
+        {
+            [Status_TF setStringValue:@"请点击Comfirm确认选项"];
+            
+        }
+    }else
+    {
     
-    ComfirmButton.enabled = NO;
+        index = 8;
+        startbutton.enabled = NO;
+    }
+}
+
+
+- (IBAction)chooseCompanyAction:(id)sender {
     
+    NSLog(@"comanyItem.titleOfSelectedItem: %@", comanyItem.titleOfSelectedItem);
+    
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:kTestCompanyNotice object:comanyItem.titleOfSelectedItem];
 }
 
 
@@ -403,7 +366,13 @@ NSString * param_Name = @"Param";
         
         fix_A_num = 101;
         notiString_A = noti.object;
-        A_resultDic = noti.userInfo;
+        A_resultDic =  [noti.userInfo mutableCopy];
+        
+        NSLog(@"A_resultDic：%@",noti.userInfo);
+        if ([noti.object containsString:@"X"]) {
+            
+            totalNum--;
+        }
         
         NSLog(@"fixture_A 测试已经完成了");
     }
@@ -412,15 +381,26 @@ NSString * param_Name = @"Param";
         fix_B_num = 102;
         notiString_B = noti.object;
         B_resultDic  = noti.userInfo;
+         NSLog(@"B_resultDic：%@",B_resultDic);
+
         NSLog(@"fixture_B 测试已经完成了");
+        if ([noti.object containsString:@"X"]) {
+            
+            totalNum--;
+        }
     }
     if ([noti.object containsString:@"3"]) {
         
-        fix_C_num = 103;
+         fix_C_num = 103;
          notiString_C = noti.object;
          C_resultDic = noti.userInfo;
         
         NSLog(@"fixture_C 测试已经完成了");
+        
+        if ([noti.object containsString:@"X"]) {
+            
+            totalNum--;
+        }
     }
     if ([noti.object containsString:@"4"]) {
         
@@ -428,6 +408,11 @@ NSString * param_Name = @"Param";
         notiString_D = noti.object;
         D_resultDic = noti.userInfo;
         NSLog(@"fixture_D 测试已经完成了");
+        
+        if ([noti.object containsString:@"X"]) {
+            
+            totalNum--;
+        }
     }
 
 }
@@ -450,20 +435,25 @@ NSString * param_Name = @"Param";
             
             BOOL  isOpen = [serialport Open:param.contollerBoard];
             
-            if (param.isDebug) {
+            if (param.isDebug)
+            {
                 
                   NSLog(@"index = 0,debug中，模拟控制板初始化");
                  [self UpdateTextView:@"index = 0,模拟控制板初始化" andClear:NO andTextView:Log_View];
+                 dispatch_async(dispatch_get_main_queue(), ^{
+                     
+                     [Status_TF setStringValue:@"index = 0,Debug:控制板初始化"];
+                 });
+                
                  index = 1;
             }
             else if(isOpen)
             {
-                NSLog(@"控制板成功连接");
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [Status_TF setStringValue:@"index=0,Controller Board connect success"];
                 });
                 
-                [self UpdateTextView:@"index = 0,控制板连接成功" andClear:NO andTextView:Log_View];
+                [self UpdateTextView:@"index = 0,FIX-O connect success" andClear:NO andTextView:Log_View];
                 
                 [NSThread sleepForTimeInterval:0.2];
                 
@@ -487,15 +477,25 @@ NSString * param_Name = @"Param";
                 }
                 else
                 {
-                 
                     dispatch_async(dispatch_get_main_queue(), ^{
                         [Status_TF setStringValue:@"请检查治具电源"];
                     });
-                
                 }
                 
-               
-                
+                //开始测试时，气缸弹出来
+                while (YES) {
+                    
+                    [NSThread sleepForTimeInterval:0.2];
+                    [serialport WriteLine:@"reset"];
+                    [NSThread sleepForTimeInterval:0.5];
+                    NSString * backstring = [serialport ReadExisting];
+                    
+                    if ([backstring containsString:@"OK"]) {
+                        
+                        break;
+                    }
+                    
+                }
             }
             else
             {
@@ -504,50 +504,63 @@ NSString * param_Name = @"Param";
                     [Status_TF setStringValue:@"Controller Board connect fail"];
                 });
                 [self UpdateTextView:@"index = 0,控制板打开失败" andClear:NO andTextView:Log_View];
-                
             }
         }
+        
+        
 #pragma mark-------------//index=1,初始化温湿度板子
         if (index == 1) {
             
-          
-            
-            
-            if (param.isDebug) {
-                
+                      
+            if (param.isDebug)
+            {
                 NSLog(@"index = 1,debug 模式中");
                 [self UpdateTextView:@"index = 1,debug 模式中,模拟温湿度板子初始化" andClear:NO andTextView:Log_View];
                 index = 2;
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    
+                    [Status_TF setStringValue:@"index = 0,Debug:温湿度初始化"];
+                });
+
             }
             else if (!humiturePort.IsOpen)
             {
                  BOOL  isOpen = [humiturePort Open:param.humiture_uart_port_name];
                  if (isOpen) {
+                     
                     dispatch_async(dispatch_get_main_queue(), ^{
                         [Status_TF setStringValue:@"index=1,Humiture connect success"];
                     });
+                     
+                     
                     //获取温湿度的值
+                    [NSThread sleepForTimeInterval:0.5];
                     [humiturePort WriteLine:@"Read"];
                     [NSThread sleepForTimeInterval:0.5];
                     NSString  * back_humitureStr = [[humiturePort ReadExisting] stringByReplacingOccurrencesOfString:@"\n" withString:@""];
                     back_humitureStr= [back_humitureStr stringByReplacingOccurrencesOfString:@"\r" withString:@""];
-                    //显示温湿度
+                    
+                     //显示温湿度
                     dispatch_async(dispatch_get_main_queue(), ^{
                         
                         [humiture_TF setStringValue:back_humitureStr];
                     });
-                     if ([back_humitureStr containsString:@","]) {
+                     
+                     if ([back_humitureStr containsString:@","])
+                     {
                          
                          NSArray  * arr = [back_humitureStr componentsSeparatedByString:@","];
+                
                          //存储温湿度
+                         [config_Dic setValue:[arr[1] stringByReplacingOccurrencesOfString:@"%" withString:@""] forKey:kHumit];
                          [config_Dic setValue:arr[0] forKey:kTemp];
-                         [config_Dic setValue:arr[1] forKey:kHumit];
-
+                         [self UpdateTextView:@"index = 1,温湿度连接成功" andClear:NO andTextView:Log_View];
+                         
+                          index = 2;
                      }
+
                      
-                     
-                    [self UpdateTextView:@"index = 1,温湿度连接成功" andClear:NO andTextView:Log_View];
-                    index = 2;
+                   
                 }
                 else
                 {
@@ -564,6 +577,7 @@ NSString * param_Name = @"Param";
                 });
                 
                 //获取温湿度的值
+                [NSThread sleepForTimeInterval:0.5];
                 [humiturePort WriteLine:@"Read"];
                 [NSThread sleepForTimeInterval:0.5];
                 NSString  * back_humitureStr = [humiturePort ReadExisting];
@@ -574,128 +588,97 @@ NSString * param_Name = @"Param";
                     [humiture_TF setStringValue:back_humitureStr];
                 });
                 
-                if ([back_humitureStr containsString:@","]) {
+                if ([back_humitureStr containsString:@","])
+                {
                     
                     NSArray  * arr = [back_humitureStr componentsSeparatedByString:@","];
+                    
+                
                     //存储温湿度
                     [config_Dic setValue:arr[0] forKey:kTemp];
-                    [config_Dic setValue:arr[1] forKey:kHumit];
-                    
+                    [config_Dic setValue:[arr[1] stringByReplacingOccurrencesOfString:@"%" withString:@""] forKey:kHumit];
+                
                 }
                 
                 index = 2;
             }
-
-        
         }
         
 
 #pragma mark-------------//index = 2,请选择测试项
-        if (index == 2) {
-           
-            [NSThread sleepForTimeInterval:0.3];
-            //如果是单测试，请选择要测试的项，
+        if (index == 2)
+        {
+              index = 3;
+            
             dispatch_async(dispatch_get_main_queue(), ^{
                 
-                [Status_TF setStringValue:@"index = 3,请选择测试项"];
-
+                [Status_TF setStringValue:@"index = 3,开始检测SN"];
             });
-            
-            
-            
-            if (ComfirmButton.hidden) {
-                
-                  index = 100;
-            }
-            else
-            {
-                  index = 1000;
-            }
-            
-            [mkTimer endTimer];
-            
-    
         }
-        
-        
-        
-#pragma mark--------------//index = 100,检测服务器
-        if (index == 100) {
-            
-            [NSThread sleepForTimeInterval:1];
-            if (param.isDebug) {
-                
-                index = 3;
-            }
-            else if (IsUploadSFC_Button.state)
-            {
-                
-                if ([testStep StepSFC_CheckUploadSN:YES Option:@"isConnectServer" testResult:nil startTime:nil testArgument:nil]) {
-                    
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                       
-                        [Status_TF setStringValue:@"服务器检测OK"];
-                        
-                    });
-                    
-                    index = 3;
-                }
-                else
-                {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        
-                        [Status_TF setStringValue:@"服务器检测NG"];
-                        
-                    });
-                }
-            }
-            else
-            {
-                index = 3;
-            
-            }
-        }
-        
-        
         
         
 #pragma mark-------------//index = 3,检测SN1的输入值
         if (index == 3) {
             
-            [NSThread sleepForTimeInterval:1];
-             sfcManager.station_id = fixtureID;
+            [NSThread sleepForTimeInterval:0.5];
+            sfcManager.station_id = fixtureID;
             testnum = 0;
             
-            if (param.isDebug) {
+            if (param.isDebug&&singleTest) {
                 
-                
-                if ([NS_TF1.stringValue length] == [num_PopButton.titleOfSelectedItem intValue]) {
-                    action1.dut_sn = [NS_TF1 stringValue];
-                    index = 4;
-                }
-              
-            }
-            else if (singleTest)
-            {
                 if (choose_dut1.state) {
                     
-                    if (isUpLoadSFC) {
-                         [self compareSNToServerwithTextField:NS_TF1 Index:3 SnIndex:1];
-                    }
-                    else
-                    {
-                         [self ShowcompareNumwithTextField:NS_TF1 Index:3 SnIndex:1];
-                    }
-                  
-                      action1.dut_sn = NS_TF1.stringValue;
+                    [self ShowcompareNumwithTextField:NS_TF1 Index:3 SnIndex:1];
+                    //action1.dut_sn = NS_TF1.stringValue;
+                    action1.isTest = YES;
                 }
                 else
                 {
                     index = 4;
+                    action1.isTest = NO;
+                }
+                
+            }
+            else if (param.isDebug){
+                
+                if ([NS_TF1.stringValue length] == [num_PopButton.titleOfSelectedItem intValue]) {
+                    //action1.dut_sn = [NS_TF1 stringValue];
+                    index = 4;
+                    
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        
+                        [Status_TF setStringValue:@"index = 3,SN1 is OK"];
+                    });
+                }
+                
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    
+                    [Status_TF setStringValue:@"index = 3,SN1 is Wrong"];
+                    
+                });
+            }
+            else if (singleTest){
+                if (choose_dut1.state) {
+                    
+                    if (isUpLoadSFC)
+                    {
+                        [self compareSNToServerwithTextField:NS_TF1 Index:3 SnIndex:1];
+                    }
+                    else
+                    {
+                        [self ShowcompareNumwithTextField:NS_TF1 Index:3 SnIndex:1];
+                    }
+                   // action1.dut_sn = NS_TF1.stringValue;
+                    action1.isTest = YES;
+                }
+                else
+                {
+                    index = 4;
+                    action1.isTest = NO;
                 }
             }
-            else
-            {
+            else{
+                
                 if (isUpLoadSFC) {
                     [self compareSNToServerwithTextField:NS_TF1 Index:3 SnIndex:1];
                 }
@@ -704,31 +687,51 @@ NSString * param_Name = @"Param";
                     [self ShowcompareNumwithTextField:NS_TF1 Index:3 SnIndex:1];
                 }
                 
-                action1.dut_sn = NS_TF1.stringValue;
+                //action1.dut_sn = NS_TF1.stringValue;
+                action1.isTest = YES;
             }
             
         }
         
-        
-        
-        
-        
-        
 #pragma mark-------------//index = 4,检测SN2的输入值
         if (index == 4) {
             
-            [NSThread sleepForTimeInterval:1];
+            [NSThread sleepForTimeInterval:0.5];
             
-            if (param.isDebug) {
+            if (param.isDebug&&singleTest) {
+                
+                if (choose_dut2.state)
+                {
+                    [self ShowcompareNumwithTextField:NS_TF2 Index:4 SnIndex:2];
+                   // action2.dut_sn = NS_TF2.stringValue;
+                    action2.isTest = YES;
+                }
+                else
+                {
+                    index = 5;
+                    action2.isTest = NO;
+                }
+            }
+            else if (param.isDebug) {
                 
                 if ([NS_TF2.stringValue length] == [num_PopButton.titleOfSelectedItem intValue]) {
-                    action2.dut_sn = [NS_TF2 stringValue];
+                    //action2.dut_sn = [NS_TF2 stringValue];
                     index = 5;
+                    
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        
+                        [Status_TF setStringValue:@"index = 4,SN2 is OK"];
+                    });
                 }
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    
+                    [Status_TF setStringValue:@"index = 4,SN2 is Wrong"];
+                });
             }
             else if (singleTest) {
                 
-                if (choose_dut2.state) {
+                if (choose_dut2.state)
+                {
                     
                     if (isUpLoadSFC) {
                          [self compareSNToServerwithTextField:NS_TF2 Index:4 SnIndex:2];
@@ -738,39 +741,70 @@ NSString * param_Name = @"Param";
                          [self ShowcompareNumwithTextField:NS_TF2 Index:4 SnIndex:2];
                     }
                    
-                    action2.dut_sn = NS_TF2.stringValue;
+                   // action2.dut_sn = NS_TF2.stringValue;
+                    action2.isTest = YES;
                 }
                 else
                 {
                     index = 5;
+                    action2.isTest = NO;
                 }
             }
             else
             {
                 if (isUpLoadSFC) {
+                    
                      [self compareSNToServerwithTextField:NS_TF2 Index:4 SnIndex:2];
                 }
                 else
                 {
                      [self ShowcompareNumwithTextField:NS_TF2 Index:4 SnIndex:2];
+                    
+                    if ([NS_TF2.stringValue length] == [num_PopButton.titleOfSelectedItem intValue]) {
+                        
+                        index = index  + 2;
+                    }
                 }
                 
-                action2.dut_sn = NS_TF2.stringValue;
+                //action2.dut_sn = NS_TF2.stringValue;
+                action2.isTest = YES;
             }
-            
         }
         
 #pragma mark-------------//index = 5,检测SN3的输入值
         if (index == 5) {
             
-            [NSThread sleepForTimeInterval:1];
+            [NSThread sleepForTimeInterval:0.5];
             
-            if (param.isDebug) {
+            if (param.isDebug&&singleTest) {
+                
+                if (choose_dut3.state) {
+                    [self ShowcompareNumwithTextField:NS_TF3 Index:5 SnIndex:3];
+                    //action3.dut_sn = NS_TF3.stringValue;
+                    action3.isTest = YES;
+                }
+                else
+                {
+                    index = 6;
+                    action3.isTest = NO;
+                }
+            }
+           else if (param.isDebug) {
                 
                 if ([NS_TF3.stringValue length] == [num_PopButton.titleOfSelectedItem intValue]) {
-                    action3.dut_sn = [NS_TF3 stringValue];
+                    //action3.dut_sn = [NS_TF3 stringValue];
                     index = 6;
+                    
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        
+                        [Status_TF setStringValue:@"index = 5,SN3 is OK"];
+                    });
                 }
+                
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    
+                    [Status_TF setStringValue:@"index = 5,SN3 is wrong"];
+                });
             }
             else if (singleTest)
             {
@@ -785,11 +819,13 @@ NSString * param_Name = @"Param";
                       [self ShowcompareNumwithTextField:NS_TF3 Index:5 SnIndex:3];
                     }
                     
-                    action3.dut_sn = NS_TF3.stringValue;
+                    //action3.dut_sn = NS_TF3.stringValue;
+                    action3.isTest = YES;
                 }
                 else
                 {
                     index = 6;
+                    action3.isTest = NO;
                 }
             }
             else
@@ -805,7 +841,8 @@ NSString * param_Name = @"Param";
                 }
                 
                 
-                action3.dut_sn = NS_TF3.stringValue;
+                //action3.dut_sn = NS_TF3.stringValue;
+                action3.isTest = YES;
             }
             
             
@@ -816,14 +853,39 @@ NSString * param_Name = @"Param";
         
         if (index == 6) {
             
-            [NSThread sleepForTimeInterval:1];
-            
-            if (param.isDebug) {
+            [NSThread sleepForTimeInterval:0.5];
+           
+            if (param.isDebug&&singleTest) {
+                
+                if (choose_dut4.state) {
+                    [self ShowcompareNumwithTextField:NS_TF4 Index:6 SnIndex:4];
+                    //action4.dut_sn = NS_TF4.stringValue;
+                    action4.isTest = YES;
+                }
+                else
+                {
+                    index = 7;
+                    action4.isTest = NO;
+                }
+                
+            }
+           else if (param.isDebug)
+            {
                 
                 if ([NS_TF4.stringValue length] == [num_PopButton.titleOfSelectedItem intValue]) {
-                    action4.dut_sn = [NS_TF4 stringValue];
+                    //action4.dut_sn = [NS_TF4 stringValue];
                     index = 7;
+                    
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        
+                        [Status_TF setStringValue:@"index = 6,SN4 is OK"];
+                    });
                 }
+                
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    
+                    [Status_TF setStringValue:@"index = 6,SN4 is Wrong"];
+                });
             }
             else if (singleTest) {
                 
@@ -837,11 +899,13 @@ NSString * param_Name = @"Param";
                     {
                          [self ShowcompareNumwithTextField:NS_TF4 Index:6 SnIndex:4];
                     }
-                    action4.dut_sn = NS_TF4.stringValue;
+                    //action4.dut_sn = NS_TF4.stringValue;
+                    action4.isTest = YES;
                 }
                 else
                 {
                     index = 7;
+                    action4.isTest = NO;
                 }
             }
             else
@@ -854,7 +918,8 @@ NSString * param_Name = @"Param";
                     [self ShowcompareNumwithTextField:NS_TF4 Index:6 SnIndex:4];
                 }
                 
-                 action4.dut_sn = NS_TF4.stringValue;
+                 //action4.dut_sn = NS_TF4.stringValue;
+                 action4.isTest = YES;
             }
             
         }
@@ -866,49 +931,18 @@ NSString * param_Name = @"Param";
             
             [NSThread sleepForTimeInterval:0.3];
             [self saveConfigStation];
-            
-        
-            
-            if (change_OpID.state) {
-                
-                NSLog(@"Please cancell Change Button");
-                
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [Status_TF setStringValue:@"index=7,Please cancell Change Button"];
-                });
-            }
-            else
-            {
-                NSLog(@"Cancell Change Button OK");
-                
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [Status_TF setStringValue:@"index=7,Cancell Change Button OK"];
-                });
-                
-            }
-            
+
             
             if (config_change.state) {
                 
                 NSLog(@"Please cancell Config Button");
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [Status_TF setStringValue:@"index=7,Please cancell Config Button"];
-                });
-            }
-            else
-            {
-                NSLog(@"Cancell Config Button OK");
-                
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [Status_TF setStringValue:@"index=7,Cancell Config Button OK"];
+                    [Status_TF setStringValue:@"index=7,Cancell Change Button"];
                 });
             }
             
             
-            
-            
-            
-            if (!config_change.state&&!change_OpID.state) {
+            if (!config_change.state) {
                 
                 //配置好了，将相关参数传送
                 if (action1!=nil) {
@@ -942,60 +976,46 @@ NSString * param_Name = @"Param";
                     [DUT_Result3_TF setStringValue:@""];
                     [DUT_Result4_TF setStringValue:@""];
                      startbutton.enabled = YES;
+                    [Status_TF setStringValue:@"Index = 8,Click Start Button"];
+                    
                 });
-
-                
-                
                 [self UpdateTextView:@"index=7,参数已经配置好" andClear:NO andTextView:Log_View];
-                
-                if ([Operator_TF.stringValue length]==17) {
-
-                    index = 8;
-                }
-                else
-                {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [Status_TF setStringValue:@"Operator_TF 错误，请输入正确的ID"];
-                    });
-                
-                }
+                index = 1000;
             }
         }
         
-
-
+        
 #pragma mark-------------//index=8,双击start按钮/或者点击界面上的start按钮
         if (index == 8) {
             
-             [NSThread sleepForTimeInterval:0.5];
-            if (!startbutton.enabled) {
+            [NSThread sleepForTimeInterval:0.5];
             
-                
+            if (!startbutton.enabled)
+            {
                 [serialport WriteLine:@"start"];
             }
             
              [NSThread sleepForTimeInterval:0.5];
-              NSString  * backstring = [serialport ReadExisting] ;
+              NSString  * backstring = [serialport ReadExisting];
             
             if (param.isDebug) {
                 NSLog(@"index = 8,debug 模式中");
                 [self UpdateTextView:@"index = 8,debug 模式中,监测双击启动" andClear:NO andTextView:Log_View];
                 index = 9;
             }
-            else if ([backstring containsString:@"START"]&&[backstring containsString:@"*_*\r\n"])
+            else if ([[backstring uppercaseString] containsString:@"START"]&&[backstring containsString:@"*_*\r\n"])
             {
                 NSLog(@"检测START，软件开始测试");
-                
+                [self UpdateTextView:@"index = 8,检测到Start" andClear:NO andTextView:Log_View];
                 dispatch_async(dispatch_get_main_queue(), ^{
                     
-                    [Status_TF setStringValue:@"index=9,Start OK"];
+                    [Status_TF setStringValue:@"index=8,Start OK"];
                     
                 });
                 
-                [self UpdateTextView:@"index=9,Start OK" andClear:NO andTextView:Log_View];
+                [self UpdateTextView:@"index=8,Start OK" andClear:NO andTextView:Log_View];
                 
                 index = 9;
-                
             }
             else
             {
@@ -1005,31 +1025,38 @@ NSString * param_Name = @"Param";
                 
                 [self UpdateTextView:@"Start NG,请启动" andClear:NO andTextView:Log_View];
             }
-            
-            
         }
 
         
-
  #pragma mark-------------//index=9,发送开始测试的通知
-        if (index == 9) {
+        if (index == 9)
+        {
             
-        
+            //给SN赋值
+            action1.dut_sn = NS_TF1.stringValue;
+            action2.dut_sn = NS_TF2.stringValue;
+            action3.dut_sn = NS_TF3.stringValue;
+            action4.dut_sn = NS_TF4.stringValue;
+            
+
+            
             [[NSNotificationCenter defaultCenter] postNotificationName:@"NSThreadStart_Notification" object:nil];
             
             dispatch_async(dispatch_get_main_queue(), ^{
-                
+
                 startbutton.enabled = NO;
                 ReloadButton.hidden = YES;
+            
             });
+            
             [testFieldTimes setStringValue:@"0"];
             [mkTimer setTimer:0.1];
             [mkTimer startTimerWithTextField:testFieldTimes];
-             ct_cnt = 1;
-            [self UpdateTextView:@"index = 10,程序开始测试" andClear:NO andTextView:Log_View];
+            ct_cnt = 1;
+            [self UpdateTextView:@"index = 9,程序开始测试" andClear:NO andTextView:Log_View];
             
             dispatch_async(dispatch_get_main_queue(), ^{
-                [Status_TF setStringValue:@"index=10,Testing......"];
+                [Status_TF setStringValue:@"index=10, Testing......"];
             });
             index = 1000;
     
@@ -1043,7 +1070,8 @@ NSString * param_Name = @"Param";
             
             testingFixStr = @"ASN1";
             
-            if (param.isDebug) {
+            if (param.isDebug)
+            {
                 
                 NSLog(@"治具A测试完毕，灯光操作完成");
                 [self UpdateTextView:@"fix_A_num = 101,治具A灯光操作已经完成" andClear:NO andTextView:Log_View];
@@ -1051,19 +1079,23 @@ NSString * param_Name = @"Param";
                 fix_A_num =0;
                 
                 if ([notiString_A containsString:@"P"]) {
-                    
                     passNum++;
                 }
-                
                 if (testnum==[ChooseNumArray count]||testnum== 4) {
                     
                     index = 105;
-                    
                     NSLog(@"A====%d",testnum);
                 }
             }
             else
             {
+                
+                //上传PDCA
+                if (![notiString_A containsString:@"X"]&&isUpLoadPDCA==YES) {
+                    
+                    [pdca UploadPDCA_Dafen:1 Dic:A_resultDic Arr:itemArr1 BOOL:[notiString_A containsString:@"P"]?YES:NO];
+                }
+
                 [self LightAndShowResultWithFix:notiString_A TestingFixStr:testingFixStr Dictionary:A_resultDic];
             }
             
@@ -1095,6 +1127,14 @@ NSString * param_Name = @"Param";
             }
             else
             {
+                
+                //上传PDCA
+                if (![notiString_B containsString:@"X"]&&isUpLoadPDCA==YES) {
+                   
+                    NSLog(@"B_resultDic：上传PDCA的时间");
+                   [pdca UploadPDCA_Dafen:2 Dic:B_resultDic Arr:itemArr1 BOOL:[notiString_B containsString:@"P"]?YES:NO];
+                }
+                
                 [self LightAndShowResultWithFix:notiString_B TestingFixStr:testingFixStr Dictionary:B_resultDic];
             }
             
@@ -1126,6 +1166,12 @@ NSString * param_Name = @"Param";
             }
             else
             {
+                //上传PDCA
+                if (![notiString_C containsString:@"X"]&&isUpLoadPDCA==YES) {
+                
+                    [pdca UploadPDCA_Dafen:3 Dic:C_resultDic Arr:itemArr1 BOOL:[notiString_C containsString:@"P"]?YES:NO];
+                }
+                
                 [self LightAndShowResultWithFix:notiString_C TestingFixStr:testingFixStr Dictionary:C_resultDic];
             }
         }
@@ -1149,26 +1195,30 @@ NSString * param_Name = @"Param";
             }
             else
             {
+                
+                //上传PDCA
+                if (![notiString_D containsString:@"X"]&&isUpLoadPDCA==YES) {
+                    
+                        [pdca UploadPDCA_Dafen:4 Dic:D_resultDic Arr:itemArr1 BOOL:[notiString_D containsString:@"P"]?YES:NO];
+                }
+                
                 [self LightAndShowResultWithFix:notiString_D TestingFixStr:testingFixStr Dictionary:D_resultDic];
                 
             }
             
         }
   
-#pragma mark-------------//index=105,所有软件测试结束
+#pragma mark-------------//index=105,所有测试结束
         if (index == 105) {
             
             [NSThread sleepForTimeInterval:0.5];
             if (param.isDebug) {
-                
                 NSLog(@"整个测试已经结束，回到初始状态");
-            
             }
             else
             {
                 //发送reset的命令
                 [serialport WriteLine:@"reset"];
-                
                 [NSThread sleepForTimeInterval:0.5];
                 
                 if ([[serialport ReadExisting] containsString:@"OK"]) {
@@ -1197,7 +1247,6 @@ NSString * param_Name = @"Param";
                 [self UpdateTextView:@"" andClear:YES andTextView:D_LOG_TF];
                 
                 if (!isLoopTest) {
-                    
                     //清空SN
                     NS_TF1.stringValue = @"";
                     NS_TF2.stringValue = @"";
@@ -1205,7 +1254,6 @@ NSString * param_Name = @"Param";
                     NS_TF4.stringValue = @"";
                 }
                 
-              
                 
                 NSTextField *TF = [self.view viewWithTag:1];
                 [TF becomeFirstResponder];
@@ -1215,20 +1263,37 @@ NSString * param_Name = @"Param";
                 
             });
             
-           //测试结束时，发送结束通知
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"NSThreadEnd_Notification" object:nil];
+            //判断当前温湿度的绝对值是否超过%3
+            float temp_value = fabsf([[[NSUserDefaults standardUserDefaults] objectForKey:kTemp] floatValue]-[[config_Dic objectForKey:kTemp] floatValue]);
+            float humit_value =fabsf([[[NSUserDefaults standardUserDefaults] objectForKey:kHumit] floatValue]-[[config_Dic objectForKey:kHumit] floatValue]);
             
-            [ChooseNumArray removeAllObjects];
+        NSLog(@"temp_value=%f,humit_value=%f,action1.isShow=%hhd,action1.isShow=%hhd,action1.isShow=%hhd,action1.isShow=%hhd",temp_value,humit_value,action1.isShow,action2.isShow,action3.isShow,action4.isShow);
+            
+            if (nulltest_button.hidden&&(temp_value>20||humit_value>20||action1.isShow||action2.isShow||action3.isShow||action4.isShow)) {
+                //释放各种串口，端口
+                if (action1!=nil)[action1 threadEnd];
+                if (action2!=nil)[action2 threadEnd];
+                if (action3!=nil)[action3 threadEnd];
+                if (action4!=nil)[action4 threadEnd];
+                [alert ShowCancelAlert:@"注意:温湿度变化过大，请重新空测"];
+            }
             
             
             if (singleTest) {
                 
-                 index = 1000;
+                 index = 1;
+            }
+            else if (isLoopTest)
+            {
+                
+                index = 7;
             }
             else
             {
-                index = 2;
+                index = 1;
             }
+            
+            
 
         }
         
@@ -1248,145 +1313,67 @@ NSString * param_Name = @"Param";
 #pragma mark====================测试模式:空测，单测，循环
 -(void)selectTestModeNotice:(NSNotification *)noti
 {
-    
-    if ([noti.name isEqualToString:kSingleTestNotice]) {//单选模式
-        
-        if ([noti.object isEqualToString:@"YES"]) {
-            singleTest = YES;
-            dispatch_async(dispatch_get_main_queue(), ^{
-                
-                singlebutton.hidden = YES;
-                ComfirmButton.hidden = NO;
-                choose_dut1.enabled = YES;
-                choose_dut2.enabled = YES;
-                choose_dut3.enabled = YES;
-                choose_dut4.enabled = YES;
-                
-            });
-            
-            
-//            if (index == 1000) {
-//                
-//                index = 2;
-//            }
-//            else
-//            {
-//                //停止线程，重新开始
-//                if (thread !=nil) {
-//
-//                    [thread cancel];
-//                    thread = nil;
-//                }
-//
-//                if (thread == nil) {
-//
-//                    thread = [[NSThread alloc]initWithTarget:self selector:@selector(Working) object:nil];
-//                    [thread start];
-//                    
-//                }
-//                
-//                index = 0;
-//            }
-            
-            if (action1 !=nil) {
-                
-                [action1 threadEnd];
-                action1 = nil;
-            }
-            
-            if (action2 !=nil) {
-                
-                [action2 threadEnd];
-                action2 = nil;
-                
-            }
-            
-            if (action3 !=nil) {
-                
-                [action3 threadEnd];
-                action3 = nil;
-            }
-            
-            if (action4 !=nil) {
-                
-                [action4 threadEnd];
-                action4 = nil;
-            }
-            
-            index = 1;
-
- 
-        }
-        else
+        //空测
+        if ([noti.object isEqualToString:@"NullTest"])
         {
-            singleTest = NO;
-            dispatch_async(dispatch_get_main_queue(), ^{
-                
-               // singlebutton.hidden = NO;
-                ComfirmButton.hidden = YES;
-                choose_dut1.enabled = NO;
-                choose_dut2.enabled = NO;
-                choose_dut3.enabled = NO;
-                choose_dut4.enabled = NO;
-                
-            });
-
-            if (action1 == nil) {
-                
-                [self createThreadWithNum:1];
-            }
-            if(action2 == nil)
-            {
-                [self createThreadWithNum:2];
-            }
-            if (action3 == nil) {
-                
-                [self createThreadWithNum:3];
-            }
-            if (action4 == nil) {
-                [self createThreadWithNum:4];
-            }
-            index = 1;
-            
-        
-        }
-        
-        
-    }
-    
-    if ([noti.name isEqualToString:kNullTestNotice]) {//空测模式
-        
-        if ([noti.object isEqualToString:@"YES"]) {
             
             nulltest_button.hidden = NO;
             itemArr1 = [plist PlistRead:@"Station_Cr_3_Humid" Key:@"AllItems"];
-            
             tab1 = [tab1 init:Tab1_View DisplayData:itemArr1];
             
+            //PDCA默认为不上传
+            IsUploadPDCA_Button.state = NO;
+            isUpLoadPDCA = NO;
+            [action1 setCsvTitle:plist.titile];
+            [action2 setCsvTitle:plist.titile];
+            [action3 setCsvTitle:plist.titile];
+            [action4 setCsvTitle:plist.titile];
         }
-        else
+        //循环
+        else if ([noti.object isEqualToString:@"LoopTest"])
         {
-        
-            nulltest_button.hidden = YES;
+            isLoopTest = YES;
             itemArr1 = [plist PlistRead:@"Station_Cr_1_Humid" Key:@"AllItems"];
-            
             tab1 = [tab1 init:Tab1_View DisplayData:itemArr1];
+
             
         }
-    }
-    
-    
-    if ([noti.name isEqualToString:kLoopTestNotice]) { //循环测试模式
-        
-           isLoopTest = YES;
-        
-    }
+        //正常
+        else if ([noti.object isEqualToString:@"NormalTest"])
+        {
+            isLoopTest = NO;
+            if (nulltest_button.hidden) {
+                
+                itemArr1 = [plist PlistRead:@"Station_Cr_1_Humid" Key:@"AllItems"];
+                tab1 = [tab1 init:Tab1_View DisplayData:itemArr1];
+            }
+        }
+        //其它
+        else{
+            NSLog(@"其它测试模式");
+            itemArr1 = [plist PlistRead:@"Station_Cr_1_Humid" Key:@"AllItems"];
+            tab1 = [tab1 init:Tab1_View DisplayData:itemArr1];
 
+        }
+        
+    
+        //创建个线程
+        if (action1==nil) {
+            [self createThreadWithNum:1];
+        }
+        if (action2==nil) {
+            [self createThreadWithNum:2];
+        }
+        if (action3==nil) {
+            [self createThreadWithNum:3];
+        }
+        if (action4==nil) {
+            [self createThreadWithNum:4];
+        }
 
 }
 
-
-//PDCA和SFC的改变
+#pragma mark----------监听SFC和PDCA的上传状态
 -(void)selectSfc_PDCAUpload:(NSNotification *) noti
 {
     if ([noti.name isEqualToString:kPdcaUploadNotice]) {
@@ -1397,23 +1384,20 @@ NSString * param_Name = @"Param";
                 
                 IsUploadPDCA_Button.state = YES;
                 
+                isUpLoadPDCA = YES;
             });
-            
-            [pdca start_Thread];
         }
         else
         {
             dispatch_async(dispatch_get_main_queue(), ^{
                 
                 IsUploadPDCA_Button.state = NO;
+                
+                isUpLoadPDCA = NO;
                
             });
-            
-            [pdca end_Thread];
         }
-        
     }
-    
     
     if ([noti.name isEqualToString:kSfcUploadNotice]) {
         
@@ -1425,7 +1409,6 @@ NSString * param_Name = @"Param";
                 
                 isUpLoadSFC = YES;
             });
-            
         }
         else
         {
@@ -1443,75 +1426,55 @@ NSString * param_Name = @"Param";
 
 
 
-//创建A,B,C,D治具对应的文件ABCD
--(void)creat_TotalFile
+
+#pragma mark====================空测试结束，退出软件
+-(void)selectFinshNullTest
 {
-    NSString  *  day = [[GetTimeDay shareInstance] getCurrentDay];
     
-    totalFold = [NSString stringWithFormat:@"/%@/%@",totalPath,NestID_Change.titleOfSelectedItem];
-    
-    if ([product_Config.stringValue length]>0) {
+    //将当前温湿度的数值存储在本地
+    [[NSUserDefaults standardUserDefaults] setValue:[config_Dic objectForKey:kHumit] forKey:kHumit];
+    [[NSUserDefaults standardUserDefaults] setValue:[config_Dic objectForKey:kTemp]  forKey:kTemp];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+
+    nullNum++;
+    if (nullNum == 4) {
         
-        foldDir = [totalFold stringByAppendingFormat:@"/%@",product_Config.stringValue];
+        exit(0);
     }
-    else
-    {
-        foldDir = [totalFold stringByAppendingFormat:@"/%@",@"NoConfig"];
-    }
-    
-    
-    [self createFileWithstr:[NSString stringWithFormat:@"%@/%@_A.csv",foldDir,day] withFold:foldDir];
-    [self createFileWithstr:[NSString stringWithFormat:@"%@/%@_B.csv",foldDir,day] withFold:foldDir];
-    [self createFileWithstr:[NSString stringWithFormat:@"%@/%@_C.csv",foldDir,day] withFold:foldDir];
-    [self createFileWithstr:[NSString stringWithFormat:@"%@/%@_D.csv",foldDir,day] withFold:foldDir];
-    
 }
-
-
-/**
- *  生成文件
- *
- *  @param fileString 文件的地址
- */
--(void)createFileWithstr:(NSString *)fileString withFold:(NSString *)foldStr
-{
-    while (YES) {
-        
-        if ([[NSFileManager defaultManager] fileExistsAtPath:fileString]) {
-            break;
-        }
-        else
-        {
-            
-            [fold Folder_Creat:foldStr];
-            [csvFile CSV_Open:fileString];
-            [csvFile CSV_Write:plist.titile];
-        }
-        
-    }
-
-}
-
 
 
 
 //将空测试出来的值写到plist文件中去
-- (IBAction)NullTestDone_Button:(id)sender {
-    
+- (IBAction)NullTestDone_Button:(id)sender
+{
   [[NSNotificationCenter defaultCenter] postNotificationName:@"WriteNullValue" object:nil];
-    
 }
 
 
-//重新选择产品测试
+#pragma mark====================确认选项
 - (IBAction)makesureDut:(id)sender {
 
-    singlebutton.state = YES;
+    singlebutton.state = NO;
+    singleTest = YES;
+    isComfirmOK  = YES;
+    
+    //makesure之后不可点击
+    choose_dut1.enabled = NO;
+    choose_dut2.enabled = NO;
+    choose_dut3.enabled = NO;
+    choose_dut4.enabled = NO;
+    ComfirmButton.hidden = YES;
+    
+    [ChooseNumArray removeAllObjects];
 
     if (singleTest) {
 
        index = 3;
+        
     }
+    
+   
 
     if (choose_dut1.state) {
         
@@ -1520,15 +1483,14 @@ NSString * param_Name = @"Param";
         [ChooseNumArray addObject:@"Test"];
 
     }
-    else
-    {
-        if (action1 !=nil) {
-            
-            [action1 threadEnd];
-            action1 = nil;
-        }
-    
-    }
+//    else //销毁线程
+//    {
+//        if (action1 !=nil) {
+//            [action1 threadEnd];
+//            action1 = nil;
+//        }
+//        
+//    }
     
     if (choose_dut2.state) {
         
@@ -1536,44 +1498,70 @@ NSString * param_Name = @"Param";
         
         [ChooseNumArray addObject:@"Test"];
     }
-    else
-    {
-        if (action2 !=nil) {
-            
-            [action2 threadEnd];
-            action2 = nil;
-        }
-    }
-    
+//    else
+//    {
+//        if (action2 !=nil) {
+//            
+//            [action2 threadEnd];
+//            action2 = nil;
+//            
+//        }
+//    }
     if (choose_dut3.state) {
         
         [self createThreadWithNum:3];
         
         [ChooseNumArray addObject:@"Test"];
     }
-    else
-    {
-        
-        if (action3 !=nil) {
-            
-            [action3 threadEnd];
-            action3 = nil;
-        }
-    }
-    
+//    else
+//    {
+//        if (action3 !=nil) {
+//            
+//            [action3 threadEnd];
+//            action3 = nil;
+//        }
+//    }
+
     if (choose_dut4.state) {
         
         [self createThreadWithNum:4];
         
         [ChooseNumArray addObject:@"Test"];
     }
+//    else
+//    {
+//        if (action4 !=nil) {
+//            
+//            [action4 threadEnd];
+//            action4 = nil;
+//        }
+//
+//    
+//    }
+}
+
+
+#pragma mark====================选择测试项
+- (IBAction)single_test:(id)sender {
+    
+    if (singlebutton.state) {
+        
+        ComfirmButton.hidden = NO;
+        choose_dut1.enabled = YES;
+        choose_dut2.enabled = YES;
+        choose_dut3.enabled = YES;
+        choose_dut4.enabled = YES;
+    
+    }
     else
     {
-        if (action4 !=nil) {
-            
-            [action4 threadEnd];
-             action4 = nil;
-        }
+        choose_dut1.enabled  = NO;
+        choose_dut2.enabled  = NO;
+        choose_dut3.enabled  = NO;
+        choose_dut4.enabled  = NO;
+        ComfirmButton.hidden = YES;
+    
+    
     }
     
 }
@@ -1605,7 +1593,7 @@ NSString * param_Name = @"Param";
             nextTF = [self.view viewWithTag:tf.tag+1];
         }
        
-        
+    
         if (nextTF) {
             
             
@@ -1660,55 +1648,48 @@ NSString * param_Name = @"Param";
 }
 
 
-
-
 #pragma mark----------------生成线程
-
 -(void)createThreadWithNum:(int)num
 {
     
     if (num == 1 && action1 == nil) {
-    
-            action1 = [[TestAction alloc]initWithTable:tab1 withFixDic:param.Fix1 withFileDir:foldDir withType:1];
-            action1.resultTF  = DUT_Result1_TF;//显示结果的lable
-            action1.Log_View  = A_LOG_TF;
-            action1.Fail_View = A_FailItem;
-            action1.dutTF     = NS_TF1;
-           [action1 setCsvTitle:plist.titile];
+        action1  = [[TestAction alloc] initWithTable:tab1 withFixParam:param withType:num];
+        action1.resultTF  = DUT_Result1_TF;//显示结果的lable
+        action1.Log_View  = A_LOG_TF;
+        action1.Fail_View = A_FailItem;
+        action1.dutTF     = NS_TF1;
+       [action1 setCsvTitle:plist.titile];
         
     }
     
     if (num == 2 && action2 == nil) {
-    
-            action2 = [[TestAction alloc]initWithTable:tab1 withFixDic:param.Fix2 withFileDir:foldDir withType:2];
-            action2.resultTF  = DUT_Result2_TF;//显示结果的lable
-            action2.Log_View  = B_LOG_TF;
-            action2.Fail_View =B_FailItem;
-            action2.dutTF     = NS_TF2;
-            [action2 setCsvTitle:plist.titile];
+        action2  = [[TestAction alloc] initWithTable:tab1 withFixParam:param withType:num];
+        action2.resultTF  = DUT_Result2_TF;//显示结果的lable
+        action2.Log_View  = B_LOG_TF;
+        action2.Fail_View =B_FailItem;
+        action2.dutTF     = NS_TF2;
+        [action2 setCsvTitle:plist.titile];
     }
     
     if (num == 3 && action3 == nil) {
-        
-        action3 = [[TestAction alloc]initWithTable:tab1 withFixDic:param.Fix3 withFileDir:foldDir withType:3];
+        action3 = [[TestAction alloc]initWithTable:tab1 withFixParam:param withType:num];
         action3.resultTF   = DUT_Result3_TF;//显示结果的lable
         action3.Log_View   = C_LOG_TF;
         action3.Fail_View  = C_FailItem;
         action3.dutTF      = NS_TF3;
         [action3 setCsvTitle:plist.titile];
-       
+        
     }
     
     if (num ==4 && action4 == nil){
-        
-        action4 = [[TestAction alloc]initWithTable:tab1 withFixDic:param.Fix4 withFileDir:foldDir withType:4];
+        action4 = [[TestAction alloc] initWithTable:tab1 withFixParam:param withType:num];
         action4.resultTF  = DUT_Result4_TF;//显示结果的lable
         action4.Log_View  = D_LOG_TF;
         action4.Fail_View = D_FailItem;
         action4.dutTF     = NS_TF4;
         [action4 setCsvTitle:plist.titile];
     }
-
+    
 }
 
 
@@ -1789,17 +1770,14 @@ NSString * param_Name = @"Param";
      
             [Status_TF setStringValue:[NSString stringWithFormat:@"index = %d:SN%d NG,Enter right SN",testIndex,snIndex]];
         });
-        
     }
-
 }
 
 
 #pragma mark---------------正常测试时，无SFC请求时
 -(void)ShowcompareNumwithTextField:(NSTextField *)tf Index:(int)testIndex SnIndex:(int)snIndex
 {
-
-  
+    
     if ([tf.stringValue length] == [num_PopButton.titleOfSelectedItem intValue]) {
         
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -1889,7 +1867,14 @@ NSString * param_Name = @"Param";
     if ([string containsString:@"C"])fix_C_num=0;
     if ([string containsString:@"D"])fix_D_num=0;
     testnum++;
-    if (testnum==[ChooseNumArray count]||testnum== 4) {
+//    if (testnum==[ChooseNumArray count]||testnum== 4) {
+//        
+//        index = 105;
+//        
+//        NSLog(@"%@====%d",string,testnum);
+//    }
+    
+    if (testnum== 4) {
         
         index = 105;
         
@@ -1898,6 +1883,15 @@ NSString * param_Name = @"Param";
 
     
 }
+
+
+
+-(void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+
+}
+
 
 
 

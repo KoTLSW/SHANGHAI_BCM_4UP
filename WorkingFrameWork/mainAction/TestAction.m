@@ -22,7 +22,7 @@ NSString  *param_path=@"Param";
     NSString        *agilentReadString;
     NSDictionary    *dic;
     NSString        *SonTestName;
-    NSString        *testResultStr;                           //测试结果
+    
     NSMutableArray  *testResultArr;                           // 返回的结果数组
     NSMutableArray  *testItemTitleArr;                        //每个测试标题都加入数组中,生成数据文件要用到
     NSMutableArray  *testItemValueArr;                        //每个测试结果都加入数组中,生成数据文件要用到
@@ -30,6 +30,9 @@ NSString  *param_path=@"Param";
     NSMutableArray  *testItesmMaxLimitArr;                    //每个测试项最大值数组
     NSMutableArray  *testItemUnitArr;
     NSMutableArray  *TestItemArr;                             //软件测试总结果
+    NSMutableString *testAppendString;                        //软件测试所有值
+    NSMutableString *testResultAppendStr;                     //存取测试对象的结果
+    NSMutableString  *TestItemResult;                          //存取测试对象的结果
 
     
     NSThread        * thread;                                   //开启的线程
@@ -39,7 +42,7 @@ NSString  *param_path=@"Param";
     UpdateItem      * updateItem;                               //
     Plist           * plist;                                    //plist文件处理类
     enum AgilentB2987ACommunicateType  AgilentB2987A_USB_Type;
-    Param           * param;                                    // param参数类
+    //Param           * param;                                    // param参数类
     
     
     
@@ -68,15 +71,11 @@ NSString  *param_path=@"Param";
     
     //csv数据相关处理
     NSMutableArray * ItemArr;                                 //存测试对象的数组
-    NSMutableArray * TestValueArr;                            //存储测试结果的数组
-    //NSMutableString     * contentString;                    //测试项的vaule值
     NSMutableString     * txtContentString;                   //打印txt文件中的log
     NSMutableString     * listFailItemString;                 //测试失败的项目
     NSMutableString     * ErrorMessageString;                 //失败测试项的原因
     
     //检测PDCA和SFC的BOOL//测试结果PASS、FAIL
-    BOOL      isPDCA;
-    PDCA    *  pdca;
     BOOL       PF;
     
     //存储生成文件的具体地址
@@ -103,9 +102,16 @@ NSString  *param_path=@"Param";
     
     BOOL                   is_LRC_Collect;                       //LCR表是否连接
     BOOL                   is_JDY_Collect;                       //静电仪是否连接
-    NSMutableString               * dcrAppendString;             //DCR拼接的数据
+    NSMutableString        * dcrAppendString;                    //DCR拼接的数据
     BOOL                   addDcr;                               //40组DCR数据
     NSString               * companyName;                        //公司名称
+    
+    BOOL                    Instrument;                          //仪器是否连接OK
+    BOOL                    isDebug;                             //debug模式
+    
+    //新增加测试时时的Log值
+    NSString            * testLogPath;                           //生成的时时LOG值
+
    
     
 }
@@ -120,17 +126,36 @@ NSString  *param_path=@"Param";
  
 */
 
-
-
-
-
--(id)initWithTable:(Table *)tab withFixDic:(NSDictionary *)fix withFileDir:foldDir withType:(int)type_num
+-(id)initWithTable:(Table *)tab withFixParam:(Param *)param withType:(int)type_num
 {
-    if (self =[super init]) {
+    
+    isDebug      = param.isDebug;
+
+    if (self == [super init]) {
         
+        
+        singleFloder = param.SingleFolder;
+        
+        NSDictionary  * fix;
+        if (type_num == 1) fix = param.Fix1;
+        if (type_num == 2) fix = param.Fix2;
+        if (type_num == 3) fix = param.Fix3;
+        if (type_num == 4) fix = param.Fix4;
+        
+        
+        //初始化各种数据及其设备消息
+        self.fixture_uart_port_name = [fix objectForKey:@"fixture_uart_port_name"];
+        self.fixture_uart_baud      = [fix objectForKey:@"fixture_uart_baud"];
+        self.instr_2987             = [fix objectForKey:@"b2987_adress"];
+        self.instr_4980             = [fix objectForKey:@"e4980_adress"];
+        
+        testLogPath                 = [NSString stringWithFormat:@"%@/%@",[[NSUserDefaults standardUserDefaults] objectForKey:kTotalFoldPath],@"TestLog.txt"];
+        companyName = @"Lens";
+        
+        
+        //初始化各种的整型变量
         self.tab =tab;
         fix_type = type_num;
-        
         index = 0;
         item_index   = 0;
         row_index    = 0;
@@ -140,102 +165,75 @@ NSString  *param_path=@"Param";
         B4_E4_Sum    = 0;
         ABC_DEF_Sum  = 0;
         Cap_Sum      = 0;
-        companyName  = @"Beil";
         
         PF =  YES;
-        addDcr = NO;
-        isPDCA = YES;
+        addDcr  = NO;
+        Instrument = NO;
+        self.isShow = NO;
         
         //初始化各类数组和可变字符串
-        ItemArr         = [[NSMutableArray alloc] initWithCapacity:10];
-        TestValueArr    = [[NSMutableArray alloc] initWithCapacity:10];
-        TestItemArr     = [[NSMutableArray  alloc] initWithCapacity:10];
-        txtContentString=[[NSMutableString alloc]initWithCapacity:10];
-        listFailItemString=[[NSMutableString alloc]initWithCapacity:10];
-        ErrorMessageString=[[NSMutableString alloc]initWithCapacity:10];
-        dcrAppendString = [[NSMutableString alloc] initWithCapacity:10];
+        ItemArr             = [[NSMutableArray alloc]initWithCapacity:10];
+        TestItemArr         = [[NSMutableArray  alloc] initWithCapacity:10];
+        txtContentString    =[[NSMutableString alloc]initWithCapacity:10];
+        listFailItemString  =[[NSMutableString alloc]initWithCapacity:10];
+        ErrorMessageString  =[[NSMutableString alloc]initWithCapacity:10];
+        dcrAppendString     = [[NSMutableString alloc] initWithCapacity:10];
         store_Dic = [[NSMutableDictionary alloc] initWithCapacity:10];
+        testAppendString    = [[NSMutableString alloc] initWithCapacity:10];
+        testResultAppendStr = [[NSMutableString alloc] initWithCapacity:10];
         
-        
-        
-        param = [[Param alloc]init];
-       [param ParamRead:param_path];
-        plist = [Plist shareInstance];
-        
+    
         //初始化各种串口
+        plist = [Plist shareInstance];
         timeDay     =  [GetTimeDay shareInstance];
-        pdca        =  [[PDCA alloc]init];
         sfcManager  =  [BYDSFCManager Instance];
         serialport  =  [[SerialPort alloc]init];
         updateItem  =  [[UpdateItem alloc] init];
-        
         agilentE4980A = [[AgilentE4980A alloc]init];
         agilentB2987A = [[AgilentB2987A alloc]init];
-        
         [serialport setTimeout:1 WriteTimeout:1];
         
-        //初始化文件的类
-        csv_file  = [[FileCSV alloc] init];
-        //csv_file  = [FileCSV shareInstance];
-        [csv_file addGlobalLock];
-        txt_file  = [[FileTXT  alloc]init];
-        total_file= [[FileCSV alloc] init];
-        [total_file addGlobalLock];
-        fold     =  [[Folder  alloc] init];
+        //赋值
         
-         teststep = [TestStep Instance];
-        [teststep addGlobalLock];
-        
-        
-        //初始化各种数据及其设备消息
-        self.fixture_uart_port_name = [fix objectForKey:@"fixture_uart_port_name"];
-        self.fixture_uart_baud      = [fix objectForKey:@"fixture_uart_baud"];
-        self.instr_2987             = [fix objectForKey:@"b2987_adress"];
-        self.instr_4980             = [fix objectForKey:@"e4980_adress"];
-        
-        singleFloder                = [fix objectForKey:@"singleFloder"];
-    
-        
-        
-        
-        //从param.plist文件中获取相关的值
         updateItem.fix_ABC_DEF_Res  = [fix objectForKey:@"fix_ABC_DEF_Res"];
         updateItem.fix_B2_E2_Res    = [fix objectForKey:@"fix_B2_E2_Res"];
         updateItem.fix_B4_E4_Res    = [fix objectForKey:@"fix_B4_E4_Res"];
         updateItem.fix_B_E_Res      = [fix objectForKey:@"fix_B_E_Res"];
         updateItem.fix_Cap          = [fix objectForKey:@"fix_Cap"];
         
+        //初始化文件处理类
+        csv_file  = [[FileCSV alloc] init];
+        [csv_file addGlobalLock];
+        txt_file  = [FileTXT shareInstance];
+        [txt_file TXT_Open:testLogPath];
+        total_file= [[FileCSV alloc] init];
+        [total_file addGlobalLock];
+        fold     =  [[Folder  alloc] init];
+        teststep = [TestStep Instance];
+        [teststep addGlobalLock];
         
-        //=========================================监听通知
-       
+        
+        //=======================定义通知
         //监听启动
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(NSThreadStart_Notification:) name:@"NSThreadStart_Notification" object:nil];
-        //监听测试结束通知
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(NSThreadEnd_Notification:) name:@"NSThreadEnd_Notification" object:nil];
         //监听空测试
-        [[NSNotificationCenter defaultCenter]  addObserver:self selector:@selector(selectNullTestNoti:) name:kNullTestNotice object:nil];
+        [[NSNotificationCenter defaultCenter]  addObserver:self selector:@selector(selectNullTestNoti:) name:kTestModeNotice object:nil];
         //写入空测的值
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(writeNullValueToPlist:) name:@"WriteNullValue" object:nil];
         //Test数据选择
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(selectTestDataNoti:) name:kTest40DataNotice object:nil];
-        
-        //监听公司名称的变化
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(selectCompanyNotice:) name:kTestLargeConfigNotice object:nil];
-        
-        //监听上传PDCA的值
-        [[NSNotificationCenter defaultCenter]  addObserver:self selector:@selector(selectPDCANoti:) name:kPdcaUploadNotice object:nil];
-        
-        
 
+        //监听公司名称的变化
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(selectCompanyNotice:) name:kTestCompanyNotice object:nil];
         
         //获取全局变量
-        app = [NSApplication sharedApplication].delegate;
         thread = [[NSThread alloc]initWithTarget:self selector:@selector(TestAction) object:nil];
         [thread start];
     }
     
-    return self;
+    return  self;
 }
+
 
 
 
@@ -250,50 +248,47 @@ NSString  *param_path=@"Param";
             
             [NSThread sleepForTimeInterval:0.5];
             
-            if (param.isDebug) {
-                 NSLog(@"%@==index= 0,连接治具%@,debug模式中",[NSThread currentThread],self.fixture_uart_port_name);
-                [txtContentString appendFormat:@"%@:index=0,进入debug模式\n",[timeDay getFileTime]];
-                [self UpdateTextView:@"index=0,进入debug模式" andClear:YES andTextView:self.Log_View];
-                 index =1;
-            }
+            if (isDebug) {
+                NSLog(@"%@==index= 0,debug:connect fixture OK%@,",[NSThread currentThread],self.fixture_uart_port_name);
+                [self writeTestLog:fix_type withString:[NSString stringWithFormat:@"index=%d,Enter Debug Mode",index]];
+                [self UpdateTextView:@"index=0,Enter Debug Mode" andClear:YES andTextView:self.Log_View];
+                index =1;
+             }
             else
             {
-                
+                [self writeTestLog:fix_type withString:[NSString stringWithFormat:@"index=%d,fixture start connect",index]];
                 BOOL isCollect = [serialport Open:self.fixture_uart_port_name];
                 if (isCollect) {
                      //发送指令获取ID的值
+                     [self writeTestLog:fix_type withString:[NSString stringWithFormat:@"index=%d,fixture connect success",index]];
                     [NSThread sleepForTimeInterval:0.2];
                     [serialport WriteLine:@"Fixture ID?"];
                     [NSThread sleepForTimeInterval:0.5];
+                    [self writeTestLog:fix_type withString:[NSString stringWithFormat:@"index=%d,Fixture ID?",index]];
                      FixtureID = [serialport ReadExisting];
                     if ([FixtureID containsString:@"\r\n"]&&[FixtureID containsString:@"\r\n"]) {
                         
                         FixtureID = [[FixtureID componentsSeparatedByString:@"\r\n"] objectAtIndex:1];
                         FixtureID = [FixtureID stringByReplacingOccurrencesOfString:@"*_*" withString:@""];
+                        index =1;
                     }
                     
                      NSLog(@"index= 0,连接治具%@",self.fixture_uart_port_name);
-                    [txtContentString appendFormat:@"%@:index=0,治具已经连接\n",[timeDay getFileTime]];
-                    [self UpdateTextView:@"index=0,治具已经连接" andClear:NO andTextView:self.Log_View];
+                     [self UpdateTextView:@"index=0,治具已经连接" andClear:NO andTextView:self.Log_View];
                     
-                    index =1;
                 }
             }
-            
-//#warning  debug
-//            index = 2;
-           
         }
         
 #pragma mark--------连接LCR表4980 和 静电仪器2987A
         if (index == 1) {
             
             [NSThread sleepForTimeInterval:0.5];
-            if (param.isDebug) {
+            if (isDebug) {
                 
-                NSLog(@"index= 1,仿仪器出口已连接%@,debug模式中",self.instrument_name);
-                [txtContentString appendFormat:@"%@:index=1,debug模式中\n",[timeDay getFileTime]];
-                [self UpdateTextView:@"index=1,进入debug模式" andClear:NO andTextView:self.Log_View];
+                NSLog(@"index= 1,debug:Instrument has connect%@,debug",self.instrument_name);
+                [self writeTestLog:fix_type withString:[NSString stringWithFormat:@"index=%d,debug,InStrument connect success",index]];
+                [self UpdateTextView:@"index=2,进入debug模式,仪表已连接" andClear:NO andTextView:self.Log_View];
                 index =1000;
             }
             else
@@ -306,69 +301,78 @@ NSString  *param_path=@"Param";
                 
                 if (!is_LRC_Collect){
                     NSLog(@"LCR-4980 Not Connected");
+                    [self writeTestLog:fix_type withString:[NSString stringWithFormat:@"index=%d,LCR Connect Fail",index]];
                     [self UpdateTextView:@"index=1,LCR-4980 Not Connected" andClear:NO andTextView:self.Log_View];
                 }
                 else{
-                     NSLog(@"LCR-4980 Connected");
-                     [self UpdateTextView:@"index=1,LCR-4980 Connected" andClear:NO andTextView:self.Log_View];
+                    NSLog(@"LCR-4980 Connected");
+                    [self UpdateTextView:@"index=1,LCR-4980 Connected" andClear:NO andTextView:self.Log_View];
+                    [self writeTestLog:fix_type withString:[NSString stringWithFormat:@"index=%d,LCR Connect Success",index]];
                 }
                 
                 
                 if (!is_JDY_Collect) {
                     
+                    [self writeTestLog:fix_type withString:[NSString stringWithFormat:@"index=%d,Start Connect DMM",index]];
                     is_JDY_Collect = [agilentB2987A Find:self.instr_2987 andCommunicateType:AgilentB2987A_USB_Type]&&[agilentB2987A OpenDevice:self.instr_2987 andCommunicateType:AgilentB2987A_USB_Type];
+                    
                 }
                 
                 if (!is_JDY_Collect){
-                
+                    
                     NSLog(@"JDY-2987 Not Connected");
+                    [self writeTestLog:fix_type withString:[NSString stringWithFormat:@"index=%d,Connect DMM FAIL",index]];
                     [self UpdateTextView:@"index=1,JDY-2987 Not Connected" andClear:NO andTextView:self.Log_View];
                 }
                 else
                 {
                     NSLog(@"LCR-2987 Connected");
+                    [self writeTestLog:fix_type withString:[NSString stringWithFormat:@"index=%d,Connect DMM success",index]];
                     [self UpdateTextView:@"index=1,LCR-2987 Connected" andClear:NO andTextView:self.Log_View];
                     
                 }
                 
-                if (is_LRC_Collect&&is_JDY_Collect) {
-                     //NSLog(@"index= 1,仿仪器出口已连接%@",self.instrument_name);
-                     [txtContentString appendFormat:@"%@:index=1,测试仪器已连接\n",[timeDay getFileTime]];
-                     [self UpdateTextView:@"index=1,测试仪器已连接" andClear:NO andTextView:self.Log_View];
+                if (is_LRC_Collect&&is_JDY_Collect)
+                {
+                    [self UpdateTextView:@"index=1,测试仪器已连接" andClear:NO andTextView:self.Log_View];
+                    [self writeTestLog:fix_type withString:[NSString stringWithFormat:@"index=%d,Instrument Connect success",index]];
                     
-                    index = 1000;
+                    Instrument = YES;
                 }
-                
-#warning debug模式下，无仪器时
-                
-               // index =2;
             }
         }
 #pragma mark--------获取输入框中的SN
-        if (index == 2) {
+        if (index == 2)
+        {
             //通过通知抛过来SN，以及气缸的状态
             [NSThread sleepForTimeInterval:0.5];
              NSLog(@"index =2,等待SN");
+            
             if (_dut_sn.length == 17||_dut_sn.length==21)
             {
+                
+                testAppendString       = [NSMutableString string];
+                testResultAppendStr    = [NSMutableString string];
+                
                 NSLog(@"index= 2,检测SN,并打印SN的值%@",_dut_sn);
-                index =3;
                 //启动测试的时间,csv里面用
                 start_time = [[GetTimeDay shareInstance] getFileTime];
-                [txtContentString appendFormat:@"%@:index=2,SN已经检验成功\n",[timeDay getFileTime]];
+                [self writeTestLog:fix_type withString:[NSString stringWithFormat:@"index=%d,SN is OK",index]];
                 [self UpdateTextView:@"index=2,SN已经检验成功" andClear:NO andTextView:self.Log_View];
                 
+                index =3;
             }
         }
         
 #pragma mark--------检测SN是否上传
-        if (index == 3) {
-            
+        if (index == 3)
+        {
             [NSThread sleepForTimeInterval:0.2];
-            if (param.isDebug)
+            if (isDebug)
             {
                 NSLog(@"index = 3,检测SN是否上传,debug");
                 [txtContentString appendFormat:@"%@:index=3,debug模式\n",[timeDay getFileTime]];
+                [self writeTestLog:fix_type withString:[NSString stringWithFormat:@"index=%d,Debug Mode",index]];
                 [self UpdateTextView:@"index=3,进入debug模式,检测SN上传" andClear:NO andTextView:self.Log_View];
                 
                 index = 4;
@@ -376,48 +380,44 @@ NSString  *param_path=@"Param";
             else
             {
                 index = 4;//进入正常测试中
-                //开启PDCA的时间
-                if (isPDCA) {
-                    
-                    [[NSNotificationCenter defaultCenter] postNotificationName:kTestPDCAValueNotice object:@"start time" userInfo:nil];
-                }
-                
+                [self writeTestLog:fix_type withString:[NSString stringWithFormat:@"index=%d,SN is OK",index]];
             }
-            
         }
         
         
 #pragma mark--------进入正常测试中
-        if (index == 4) {
+        if (index == 4)
+        {
             
             [NSThread sleepForTimeInterval:0.3];
-            
-            NSLog(@"index= 4,进入测试%@",self.fixture_uart_port_name);
-            [txtContentString appendFormat:@"%@:index=4,正式进入测试\n",[timeDay getFileTime]];
+            [self writeTestLog:fix_type withString:[NSString stringWithFormat:@"index=%d,Testing",index]];
             NSLog(@"打印tab中数组中的值%lu",(unsigned long)[self.tab.testArray count]);
+
             
-            testItem = [[Item alloc]initWithItem:self.tab.testArray[item_index]];
+            
+            testItem = [[Item alloc] initWithItem:self.tab.testArray[item_index]];
             
             BOOL isPass =[self TestItem:testItem];
             
             [TestItemArr addObject:testItem];
             
-            if (isPass) {//测试成功
+            if (isPass)
+            {//测试成功
                 
                 [self UpdateTextView:[NSString stringWithFormat:@"index=4:%@ 测试OK",testItem.testName] andClear:NO andTextView:self.Log_View];
+                [self writeTestLog:fix_type withString:[NSString stringWithFormat:@"index=%d,%@Test:Pass",index,testItem.testName]];
                 
             }
             else//测试结果失败
             {
-                 [self UpdateTextView:[NSString stringWithFormat:@"index=4:%@ 测试NG",testItem.testName] andClear:NO andTextView:self.Log_View];
-                 [self UpdateTextView:[NSString stringWithFormat:@"FailItem:%@\n",testItem.testName] andClear:NO andTextView:self.Fail_View];
-                
+                [self UpdateTextView:[NSString stringWithFormat:@"index=4:%@ 测试NG",testItem.testName] andClear:NO andTextView:self.Log_View];
+                [self UpdateTextView:[NSString stringWithFormat:@"FailItem:%@\n",testItem.testName] andClear:NO andTextView:self.Fail_View];
+                [self writeTestLog:fix_type withString:[NSString stringWithFormat:@"index=%d,%@Test:Fail",index,testItem.testName]];
             }
     
             //刷新界面
-            [txtContentString appendFormat:@"%@:index=4,准备刷新界面\n",[timeDay getFileTime]];
+            [self writeTestLog:fix_type withString:[NSString stringWithFormat:@"index=4,%@-->Flush",testItem.testName]];
             [self.tab flushTableRow:testItem RowIndex:row_index with:fix_type];
-            [txtContentString appendFormat:@"%@:index=4,刷新界面成功\n",[timeDay getFileTime]];
 
             
             item_index++;
@@ -426,56 +426,51 @@ NSString  *param_path=@"Param";
             if (item_index == [self.tab.testArray count])
             {
                 //给设备复位
-                [txtContentString appendFormat:@"%@:index=4,测试项测试结束\n",[timeDay getFileTime]];
+                [self writeTestLog:fix_type withString:[NSString stringWithFormat:@"index=%d,%@-->Test Finshed",index,testItem.testName]];
                 [self UpdateTextView:@"index=4,测试项测试结束" andClear:NO andTextView:self.Log_View];
                 index = 5;
                 
             }
-            
         }
         
 #pragma mark--------生成本地数据
-        if (index == 5) {
-            
+        if (index == 5)
+        {
            //测试结束的时间,csv里面用
             end_time = [[GetTimeDay shareInstance] getFileTime];
             [NSThread sleepForTimeInterval:0.2];
             NSString * path = [[NSUserDefaults standardUserDefaults] objectForKey:kTotalFoldPath];
-            totalPath  = [NSString stringWithFormat:@"%@/%@/%@/%@",path,companyName,self.NestID,[self.Config_pro length]>0?self.Config_pro:@"NoConfig"];
-            NSLog(@"打印总文件的位置%d=========%@",fix_type,totalPath);
-            
-            [fold Folder_Creat:totalPath];
-             NSString   * configCSV = [self backTotalFilePathwithFloder:totalPath];
-            
+            [fold Folder_Creat:path];
+            NSString   * totalCSV = [self backTotalFilePathwithFloder:path];
+           //穴位总数据
             if (total_file!=nil) {
                 
-                BOOL need_title = [total_file CSV_Open:configCSV];
-                [txtContentString appendFormat:@"%@:index=5,打开总csv文件->%@\n",[timeDay getFileTime],configCSV];
+                [self writeTestLog:fix_type withString:[NSString stringWithFormat:@"index=%d,Total File Path:%@",index,totalCSV]];
+                BOOL need_title = [total_file CSV_Open:totalCSV];
+                [self writeTestLog:fix_type withString:[NSString stringWithFormat:@"index=%d,Open Total File Path",index]];
                 [self SaveCSV:total_file withBool:need_title];
-                [txtContentString appendFormat:@"%@:index=5,添加数据到totalCSV文件->%@\n",[timeDay getFileTime],configCSV];
+                [self writeTestLog:fix_type withString:[NSString stringWithFormat:@"index=%d,Add Data to TotalCSV",index]];
                 [self UpdateTextView:@"index=5,往总文件中添加数据" andClear:NO andTextView:self.Log_View];
             }
             
             
             
-            
-            //2.============================生成BCMSingleLog中的文件
-            @synchronized (self)
-            {
-                 end_time = [[GetTimeDay shareInstance] getFileTime];
-                 [fold Folder_Creat:param.SingleFolder];
-                 NSString * eachCsvFile = [NSString stringWithFormat:@"%@/%@_%@_%u.csv",param.SingleFolder,self.dut_sn,end_time,arc4random()%100];
-                 if (csv_file!=nil)
-                 {
-                    BOOL need_title = [csv_file CSV_Open:eachCsvFile];
-                    [self SaveCSV:csv_file withBool:need_title];
-                    [txtContentString appendFormat:@"%@:index=5,生成生成Single_Log文件%@\n",[timeDay getFileTime],eachCsvFile];
-                    [self UpdateTextView:@"index=5,生成Single_Log文件" andClear:NO andTextView:self.Log_View];
-                 }
+           //Config下面总数据
+            totalPath  = [NSString stringWithFormat:@"%@/%@/%@/%@",path,companyName,self.NestID,[self.Config_pro length]>0?self.Config_pro:@"NoConfig"];
+            NSLog(@"打印Config文件的位置%d=========%@",fix_type,totalPath);
+            [fold Folder_Creat:totalPath];
+             NSString   * configCSV = [self backTotalFilePathwithFloder:totalPath];
+            if (total_file!=nil) {
+                [self writeTestLog:fix_type withString:[NSString stringWithFormat:@"index=%d,Config File Path:%@",index,configCSV]];
+                BOOL need_title = [total_file CSV_Open:configCSV];
+                [self writeTestLog:fix_type withString:[NSString stringWithFormat:@"index=%d,Open Config File",index]];
+                [self SaveCSV:total_file withBool:need_title];
+                [self writeTestLog:fix_type withString:[NSString stringWithFormat:@"index=%d,Add Data to Config File",index]];
+                [self UpdateTextView:@"index=5,Config总文件中添加数据" andClear:NO andTextView:self.Log_View];
             }
             
             
-            //3.============================生成总文件夹下面的单个文件
+            //2.============================生成总文件夹下面的单个文件
             @synchronized (self)
             {
                 //生成单个产品的value值csv文件
@@ -487,61 +482,35 @@ NSString  *param_path=@"Param";
                 {
                     BOOL need_title = [csv_file CSV_Open:eachCsvFile];
                     [self SaveCSV:csv_file withBool:need_title];
-                    [txtContentString appendFormat:@"%@:index=5,生成单个csv文件%@\n",[timeDay getFileTime],eachCsvFile];
+                    [self writeTestLog:fix_type withString:[NSString stringWithFormat:@"index=%d,Add Data to Single CSV",index]];
                     [self UpdateTextView:@"index=5,生成单个CSV文件" andClear:NO andTextView:self.Log_View];
                 }
-                
-                
             }
-            
             
             //生成log文件
             NSString * logFile = [NSString stringWithFormat:@"%@/log.txt",eachCsvDir];
             if (txt_file!=nil)
             {
-                
                 [txt_file TXT_Open:logFile];
                 [txt_file TXT_Write:txtContentString];
             }
             
-            
-            
-            
            //===============================
             [NSThread sleepForTimeInterval:0.2];
             NSLog(@"index= 5,本地数据生成完成%@",self.fixture_uart_port_name);
+            [self writeTestLog:fix_type withString:@"index=5,Local Data has Finshed"];
             [self UpdateTextView:@"index=5,本地数据生成完成" andClear:NO andTextView:self.Log_View];
             index = 6;
         }
         
 #pragma mark--------上传PDCA和SFC
         if (index == 6)
-        {
-           
-            
+        {            
             //上传PDCA和SFC
             [NSThread sleepForTimeInterval:0.3];
-            [txtContentString appendFormat:@"%@:index=6,准备上传PDCA\n",[timeDay getFileTime]];
             [self UpdateTextView:@"index=6,准备上传PDCA" andClear:NO andTextView:self.Log_View];
-           if (isPDCA) {
-               
-               
-               NSMutableDictionary  * resultdic = [[NSMutableDictionary alloc]initWithCapacity:10];
-               [resultdic setObject:TestItemArr forKey:@"dic"];
-               [resultdic setObject:_dut_sn forKey:@"sn"];
-               [resultdic setObject:param.sw_ver  forKey:@"sw_ver"];
-               [resultdic setObject:param.sw_name forKey:@"sw_name"];
-               [resultdic setObject:eachCsvDir forKey:@"eachCsvDir"];
-               [resultdic setObject:totalPath forKey:@"totalPath"];
-               [[NSNotificationCenter defaultCenter] postNotificationName:kTestPDCAValueNotice object:[NSString stringWithFormat:@"%dP",fix_type] userInfo:resultdic];
-            }
-            
-            [txtContentString appendFormat:@"%@:index=6,准备上传SFC\n",[timeDay getFileTime]];
-            [self UpdateTextView:@"index=6,准备上传SFC" andClear:NO andTextView:self.Log_View];
-            
-
-            
             index = 7;
+            
         }
         
         
@@ -549,14 +518,21 @@ NSString  *param_path=@"Param";
         if (index == 7)
         {
             //清空字符串
+            NSMutableDictionary  * resultdic = [[NSMutableDictionary alloc] initWithCapacity:10];
             txtContentString =[NSMutableString stringWithString:@""];
             listFailItemString = [NSMutableString stringWithString:@""];
             ErrorMessageString = [NSMutableString stringWithString:@""];
             dcrAppendString    = [NSMutableString stringWithString:@""];
             [ItemArr removeAllObjects];
-            
-            
-            
+        
+            //设置传送的数据
+            [resultdic setObject:_dut_sn forKey:@"dut_sn"];
+            [resultdic setObject:eachCsvDir forKey:@"eachCsvDir"];
+            [resultdic setObject:totalPath forKey:@"totalPath"];
+            [resultdic setObject:testAppendString forKey:@"value"];
+            [resultdic setObject:testResultAppendStr forKey:@"result"];
+        
+        
             dispatch_async(dispatch_get_main_queue(), ^{
                 
                 [self.resultTF setStringValue:PF?@"PASS":@"FAIL"];
@@ -565,24 +541,21 @@ NSString  *param_path=@"Param";
                {
                    
                   [self.resultTF setTextColor:[NSColor greenColor]];
-                   
-                    NSMutableDictionary  * resultdic = [[NSMutableDictionary alloc]initWithCapacity:10];
-                   [resultdic setObject:TestValueArr forKey:@"dic"];
-                   
-                   
-                   [[NSNotificationCenter defaultCenter] postNotificationName:SNChangeNotice object:[NSString stringWithFormat:@"%dP",fix_type] userInfo:resultdic];
+                  [self writeTestLog:fix_type withString:[NSString stringWithFormat:@"index=7,write data to Dictionary%@",resultdic]];
+                  [[NSNotificationCenter defaultCenter] postNotificationName:SNChangeNotice object:[NSString stringWithFormat:@"%dP",fix_type] userInfo:resultdic];
+                  [self writeTestLog:fix_type withString:[NSString stringWithFormat:@"index=7,Push Dictionary%@",resultdic]];
                 }
                 else
                 {
                 
                  [self.resultTF setTextColor:[NSColor redColor]];
-                    
-                    NSMutableDictionary  * resultdic = [[NSMutableDictionary alloc]initWithCapacity:10];
-                    [resultdic setObject:TestValueArr forKey:@"dic"];
-                    [[NSNotificationCenter defaultCenter] postNotificationName:SNChangeNotice object:[NSString stringWithFormat:@"%dF",fix_type] userInfo:resultdic];
-                }
                 
+                 [self writeTestLog:fix_type withString:[NSString stringWithFormat:@"index=7,write data to Dictionary%@",resultdic]];
+                 [[NSNotificationCenter defaultCenter] postNotificationName:SNChangeNotice object:[NSString stringWithFormat:@"%dF",fix_type] userInfo:resultdic];
+                 [self writeTestLog:fix_type withString:[NSString stringWithFormat:@"index=7,Push Dictionary%@",resultdic]];
+                }
             });
+            
             index = 8;
         }
         
@@ -598,6 +571,12 @@ NSString  *param_path=@"Param";
             [serialport ReadExisting];
             
             
+            //仪器仪表释放掉
+           [agilentB2987A CloseDevice];
+           [agilentE4980A CloseDevice];
+           is_LRC_Collect = NO;
+           is_JDY_Collect = NO;
+           Instrument     = NO;
             
             //清空SN
              _dut_sn=@"";
@@ -609,16 +588,18 @@ NSString  *param_path=@"Param";
             item_index =0;
             row_index = 0;
             PF = YES;
-            [TestValueArr removeAllObjects];
-            [TestItemArr removeAllObjects];
+            
             
         }
      
 #pragma mark===================发送消息，防止休眠
         if (index == 1000)
         {
-            [NSTimer scheduledTimerWithTimeInterval:500 target:self selector:@selector(timewake) userInfo:nil repeats:YES];
-            [NSThread sleepForTimeInterval:0.1];
+            [NSThread sleepForTimeInterval:0.01];
+            if (!isDebug) {
+                 index = 1;
+            }
+           
         }
     }
 }
@@ -637,6 +618,7 @@ NSString  *param_path=@"Param";
     NSString      * startTime;
     NSString      * endTime;
     startTime = [timeDay getCurrentSecond];
+
     
     for (int i=0; i<[testitem.testAllCommand count]; i++)
     {
@@ -654,14 +636,15 @@ NSString  *param_path=@"Param";
            int indexTime = 0;
             while (YES) {
                 
-                [txtContentString appendFormat:@"%@:index=4,%@治具发送指令->%@\n",[timeDay getFileTime],self.fixture_uart_port_name,subTestCommand];
-                
+                 [txtContentString appendFormat:@"%@:index=4,%@治具发送指令->%@\n",[timeDay getFileTime],self.fixture_uart_port_name,subTestCommand];
+                 [self writeTestLog:fix_type withString:[NSString stringWithFormat:@"index=4,%@ send command:%@",subTestDevice,subTestCommand]];
                 
                  [serialport WriteLine:subTestCommand];
                 
                  [NSThread sleepForTimeInterval:0.5];
                  fixtureBackString = [serialport ReadExisting];
                 
+                 [self writeTestLog:fix_type withString:[NSString stringWithFormat:@"index=5,get backValue:%@",fixtureBackString]];
                  [self UpdateTextView:[NSString stringWithFormat:@"fixtureBackString:%@",fixtureBackString] andClear:NO andTextView:self.Log_View];
                 
                  [txtContentString appendFormat:@"%@:index=4,%@治具接收返回值->%@\n",[timeDay getFileTime],self.fixture_uart_port_name,fixtureBackString];
@@ -683,66 +666,78 @@ NSString  *param_path=@"Param";
         else if ([subTestDevice isEqualToString:@"LCR"])
         {
             
-             [self UpdateTextView:[NSString stringWithFormat:@"subTestDevice%@====subTestCommand:%@",subTestDevice,subTestCommand] andClear:NO andTextView:self.Log_View];
+            [self UpdateTextView:[NSString stringWithFormat:@"subTestDevice%@====subTestCommand:%@",subTestDevice,subTestCommand] andClear:NO andTextView:self.Log_View];
+            
             
             if ([subTestCommand isEqualToString:@"RES"])
             {
-
+                [self writeTestLog:fix_type withString:@"LCR Set RES begin"];
                 [agilentE4980A SetMessureMode:AgilentE4980A_RX andCommunicateType:AgilentE4980A_USB_Type];
                 [agilentE4980A setFrequency:testItem.freq];
-
+                [self writeTestLog:fix_type withString:@"LCR Set RES finsh"];
+                
             }
             else if([subTestCommand isEqualToString:@"CPD"])
             {
+                [self writeTestLog:fix_type withString:@"LCR Set CPD begin"];
                 [agilentE4980A SetMessureMode:AgilentE4980A_CPD andCommunicateType:AgilentE4980A_USB_Type];
                 [agilentE4980A setFrequency:testItem.freq];
-
+                [self writeTestLog:fix_type withString:@"LCR Set CPD finsh"];
+                
             }
             else if ([subTestCommand isEqualToString:@"CPQ"])
             {
+                [self writeTestLog:fix_type withString:@"LCR Set CPQ begin"];
                 [agilentE4980A SetMessureMode:AgilentE4980A_CPQ andCommunicateType:AgilentE4980A_USB_Type];
                 [agilentE4980A setFrequency:testItem.freq];
-
+                [self writeTestLog:fix_type withString:@"LCR Set CPQ finsh"];
+                
             }
             else if ([subTestCommand isEqualToString:@"CSD"])
             {
+                [self writeTestLog:fix_type withString:@"LCR Set CSD begin"];
                 [agilentE4980A SetMessureMode:AgilentE4980A_CSD andCommunicateType:AgilentE4980A_USB_Type];
                 [agilentE4980A setFrequency:testItem.freq];
+                [self writeTestLog:fix_type withString:@"LCR Set CSD finsh"];
+                
             }
             else if ([subTestCommand containsString:@"CSQ"])
             {
-                
+                [self writeTestLog:fix_type withString:@"LCR Set CSQ begin"];
                 [agilentE4980A SetMessureMode:AgilentE4980A_CPQ andCommunicateType:AgilentE4980A_USB_Type];
                 [agilentE4980A setFrequency:testItem.freq];
+                [self writeTestLog:fix_type withString:@"LCR Set CSQ finsh"];
                 
             }
             else if ([subTestCommand containsString:@"Read"])
             {
+                [self writeTestLog:fix_type withString:@"LCR Read"];
                 [agilentE4980A WriteLine:@":FETC?" andCommunicateType:AgilentE4980A_USB_Type];
                 [NSThread sleepForTimeInterval:0.5];
                 agilentReadString=[agilentE4980A ReadData:16 andCommunicateType:AgilentE4980A_USB_Type];
                 NSArray *arrResult=[agilentReadString componentsSeparatedByString:@","];
                 num = [arrResult[0] floatValue];
+                [self writeTestLog:fix_type withString:[NSString stringWithFormat:@"LCR Read Value:%f",num]];
             }
             else
             {
                 NSLog(@"Other situation");
-            
+                
             }
-            
         }
         //静电仪
         else if ([subTestDevice isEqualToString:@"DMM"])
         {
             
-             [self UpdateTextView:[NSString stringWithFormat:@"subTestDevice%@====subTestCommand:%@",subTestDevice,subTestCommand] andClear:NO andTextView:self.Log_View];
+            [self UpdateTextView:[NSString stringWithFormat:@"subTestDevice%@====subTestCommand:%@",subTestDevice,subTestCommand] andClear:NO andTextView:self.Log_View];
             
             if ([testitem.testName isEqualToString:@"B4_E4_DCR"]) {
                 
-                if (param.isDebug) {
+                if (isDebug) {
                     
+                    [self writeTestLog:fix_type withString:@"DMM Start Read"];
                     if ([subTestCommand containsString:@"Read"]) {
-                       
+                        
                         int i = 40;
                         while (i>0) {
                             
@@ -755,14 +750,16 @@ NSString  *param_path=@"Param";
                     
                 }
                 else if ([subTestCommand containsString:@"RES"]) {
-                    
-                     [agilentB2987A SetMessureMode:AgilentB2987A_RES andCommunicateType:AgilentB2987A_USB_Type];
+                    [self writeTestLog:fix_type withString:@"DMM Set RES begin"];
+                    [agilentB2987A SetMessureMode:AgilentB2987A_RES andCommunicateType:AgilentB2987A_USB_Type];
+                    [self writeTestLog:fix_type withString:@"DMM Set RES finsh"];
                 }
                 else if ([subTestCommand containsString:@"Read"]) {
                     
                     if (addDcr) {
                         double num1;
                         int readtimes = 40;
+                        [self writeTestLog:fix_type withString:@"静电仪开始读取40组数据"];
                         while (readtimes>0) {
                             
                             readtimes--;
@@ -773,7 +770,7 @@ NSString  *param_path=@"Param";
                             num1 = [arrResult[0] floatValue];
                             [dcrAppendString appendString:[NSString stringWithFormat:@"%.3f,",num1*1E-9]];
                         }
-                        
+                        [self writeTestLog:fix_type withString:@"静电仪读取40组数据成功"];
                         NSArray *arrResult=[agilentReadString componentsSeparatedByString:@","];
                         num = [arrResult[0] floatValue];
                         
@@ -782,12 +779,13 @@ NSString  *param_path=@"Param";
                     {
                         
                         int readtimes = 0;
+                        [self writeTestLog:fix_type withString:@"静电仪开始正常读取数据"];
                         while (YES) {
                             
                             readtimes++;
                             
                             [agilentB2987A WriteLine:@":MEAS:RES?" andCommunicateType:AgilentB2987A_USB_Type];
-                            [NSThread sleepForTimeInterval:0.2];
+                            [NSThread sleepForTimeInterval:0.4];
                             agilentReadString=[agilentB2987A ReadData:16 andCommunicateType:AgilentB2987A_USB_Type];
                             
                             if ([agilentReadString length]>0||readtimes>=2) {
@@ -798,24 +796,25 @@ NSString  *param_path=@"Param";
                         
                         NSArray *arrResult=[agilentReadString componentsSeparatedByString:@","];
                         num = [arrResult[0] floatValue];
+                        [self writeTestLog:fix_type withString:[NSString stringWithFormat:@"静电仪读取数据:%f",num]];
                         
                     }
-                    
-
                 }
             }
             else
             {
-                if (param.isDebug) {
+                if (isDebug) {
                     
                     testvalue = @"11111111111";
                 }
                 else if ([subTestCommand containsString:@"RES"]) {
-                    
+                    [self writeTestLog:fix_type withString:@"DMM Set “RES” begin"];
                     [agilentB2987A SetMessureMode:AgilentB2987A_RES andCommunicateType:AgilentB2987A_USB_Type];
+                    [self writeTestLog:fix_type withString:@"DMM Set “RES” finsh"];
                 }
                 else if ([subTestCommand containsString:@"Read"]) {
                     
+                    [self writeTestLog:fix_type withString:@"DMM Start Read"];
                     int readtimes = 0;
                     while (YES) {
                         
@@ -833,21 +832,21 @@ NSString  *param_path=@"Param";
                     
                     NSArray *arrResult=[agilentReadString componentsSeparatedByString:@","];
                     num = [arrResult[0] floatValue];
-
+                    [self writeTestLog:fix_type withString:[NSString stringWithFormat:@"DMM Read Data:%f",num]];
+                    
                 }
             }
-            
         }
         //延迟时间
         else if ([subTestDevice isEqualToString:@"SW"])
         {
             [self UpdateTextView:[NSString stringWithFormat:@"subTestDevice%@====subTestCommand:%@",subTestDevice,subTestCommand] andClear:NO andTextView:self.Log_View];
             
-            if (!param.isDebug)
+            if (!isDebug)
             {
                  NSLog(@"软件休眠时间");
                 [NSThread sleepForTimeInterval:DelayTime];
-                [txtContentString appendFormat:@"%@:index=4,%@软件延时处理\n",[timeDay getFileTime],subTestDevice];
+                [txtContentString appendFormat:@"%@:index=4,%@ delay time\n",[timeDay getFileTime],subTestDevice];
             }
 
         }
@@ -861,32 +860,45 @@ NSString  *param_path=@"Param";
     
     
 #pragma mark--------对数据进行处理
-    if ([testitem.units containsString:@"GOhm"]) {//GOhm
+    if ([testitem.testName containsString:@"Fixture ID"]) {
+        
+        testvalue =  [FixtureID length]>0?FixtureID:@"null";
+    }
+    else if ([testitem.testName containsString:@"Slot ID"])
+    {
+        testvalue = [NSString stringWithFormat:@"%d",fix_type];
+    }
+    else if ([testitem.units containsString:@"GOhm"]) {//GOhm
         if (![testitem.testName containsString:@"B2987_CHECK"]) {
 
             if (!nulltest)
             {
-                if ([testitem.testName isEqualToString:@"B_E_DCR"]||[testitem.testName isEqualToString:@"B2_E2_DCR"]||[testitem.testName isEqualToString:@"B4_E4_DCR"]||[testitem.testName isEqualToString:@"ABC_DEF_DCR"]) {
-                    
+                if ([testitem.testName isEqualToString:@"B_E_DCR"]||[testitem.testName isEqualToString:@"B2_E2_DCR"]||[testitem.testName isEqualToString:@"H203_BC_B4_E4_DCR_X"]||[testitem.testName isEqualToString:@"ABC_DEF_DCR"]) {
                      testvalue = [NSString stringWithFormat:@"%.3f",num*1E-9];
+                    if ([testitem.testName isEqualToString:@"H203_BC_B4_E4_DCR_X"]&&[testvalue floatValue]<0) {
+                        
+                       testvalue = @"999";
+                    }
                     [self storeValueToDic_with_name:testitem.testName];
                 }
+                
             }
             else//空测试的情况
             {
                 double Rfixture   = num*1E-9;
                 
-                if([testitem.testName isEqualToString:@"B4_E4_DCR"])
+                if([testitem.testName isEqualToString:@"H203_BC_B4_E4_DCR_X"])
                 {
                     NSLog(@"打印空测的值%f",Rfixture);
-                
                 }
                 
-                if ([testitem.testName isEqualToString:@"B_E_DCR"]||[testitem.testName isEqualToString:@"B2_E2_DCR"]||[testitem.testName isEqualToString:@"B4_E4_DCR"]||[testitem.testName isEqualToString:@"ABC_DEF_DCR"]) {
+                if ([testitem.testName isEqualToString:@"B_E_DCR"]||[testitem.testName isEqualToString:@"B2_E2_DCR"]||[testitem.testName isEqualToString:@"H203_BC_B4_E4_DCR_X"]||[testitem.testName isEqualToString:@"ABC_DEF_DCR"]) {
                     
                     testvalue = [NSString stringWithFormat:@"%.3f",num*1E-9];
                     [self add_RFixture_Value_To_Sum_Testname:testitem.testName RFixture:Rfixture];
                 }
+                
+                NSLog(@"item_index:%d=======testitem.testName:%@=========testvalue:%@",item_index,testitem.testName,testvalue);
             }
 
             
@@ -899,9 +911,10 @@ NSString  *param_path=@"Param";
     }
     else if ([testitem.units containsString:@"MOhm"])//MOhm
     {
-        if (!nulltest) {
-            
-            if ([testitem.testName isEqualToString:@"B2_E2_ACR_1000"]||[testitem.testName isEqualToString:@"B4_E4_ACR_1000"]) {
+        if (!nulltest)
+        {
+
+            if ([testitem.testName isEqualToString:@"B2_E2_ACR_1000"]||[testitem.testName isEqualToString:@"H200_BC_B4_E4_ACR_1000_X"]) {
                 
                 testvalue=[NSString stringWithFormat:@"%.3f",1E-6/(num*2*3.14159*testitem.freq.integerValue)];
                 
@@ -938,41 +951,38 @@ NSString  *param_path=@"Param";
                 [store_Dic setValue:[NSString stringWithFormat:@"%.3f",Cfix] forKey:@"B2_E2_ACR_1000_Cfix"];
             }
             
-            if ([testitem.testName isEqualToString:@"B4_E4_ACR_1000"])
+            if ([testitem.testName isEqualToString:@"H200_BC_B4_E4_ACR_1000_X"])
             {
-                Cap_Sum+=Cfix;
+                Cap_Sum += Cfix;
+                
                 
                 if (Cdut <= 0)
                 {
-                    [store_Dic setValue:[NSString stringWithFormat:@"%@",smallCap] forKey:@"B4_E4_ACR_1000_Cdut"];
-                    [store_Dic setValue:[NSString stringWithFormat:@"%@",largeACR] forKey:@"B4_E4_ACR_1000_Rdut"];
+                    [store_Dic setValue:[NSString stringWithFormat:@"%@",smallCap] forKey:@"H202_BC_B4_E4_ACR_1000_Cdut_X"];
+                    [store_Dic setValue:[NSString stringWithFormat:@"%@",largeACR] forKey:@"H108_BC_ISOLATION_Z_AC"];
                 }
                 else
                 {
-                    [store_Dic setValue:[NSString stringWithFormat:@"%.3f",Cdut] forKey:@"B4_E4_ACR_1000_Cdut"];
-                    [store_Dic setValue:[NSString stringWithFormat:@"%.3f",Rdut] forKey:@"B4_E4_ACR_1000_Rdut"];
+                    [store_Dic setValue:[NSString stringWithFormat:@"%.3f",Cdut] forKey:@"H202_BC_B4_E4_ACR_1000_Cdut_X"];
+                    [store_Dic setValue:[NSString stringWithFormat:@"%.3f",Rdut] forKey:@"H108_BC_ISOLATION_Z_AC"];
                 }
                 
-                    [store_Dic setValue:[NSString stringWithFormat:@"%.3f",Cfix] forKey:@"B4_E4_ACR_1000_Cfix"];
+                [store_Dic setValue:[NSString stringWithFormat:@"%.3f",Cfix] forKey:@"H201_BC_B4_E4_ACR_1000_Cfix_X"];
             }
-            
-            
         }
-        
-        
     }
     else if ([testitem.units containsString:@"Ohm"])//Ohm
     {
         testvalue = [NSString stringWithFormat:@"%.2f",num];
-        if (param.isDebug)
+        if (isDebug)
         {
             double i=arc4random()%10+100.000000;
             testvalue=[NSString stringWithFormat:@"%.2f",i];
         }
     }
-    else if ([testitem.testName containsString:@"TEMP"])
+    else if ([testitem.testName containsString:@"H205_TEMP_X"])
     {
-        if (param.isDebug) {
+        if (isDebug) {
             
             testvalue = @"26";
         }
@@ -983,9 +993,9 @@ NSString  *param_path=@"Param";
         
      
     }
-    else if ([testitem.testName containsString:@"HUMID"])
+    else if ([testitem.testName containsString:@"H206_HUMID_X"])
     {
-        if (param.isDebug) {
+        if (isDebug) {
             
             testvalue = @"56%";
         }
@@ -994,27 +1004,20 @@ NSString  *param_path=@"Param";
             testvalue =[self.Config_Dic objectForKey:kHumit];
         }
     }
-    
     else
     {
         NSLog(@"Other test Item");
-    
     }
     
 
 #pragma mark--------对测试项进行赋值
-    if ([testitem.testName containsString:@"_Vmeas"] || [testitem.testName containsString:@"_Rref"] || [testitem.testName containsString:@"_Cfix"] || [testitem.testName containsString:@"_Vs"] || [testitem.testName containsString:@"_Cref"] || [testitem.testName containsString:@"_Rdut"] || [testitem.testName containsString:@"_Cdut"] || [testitem.testName containsString:@"_Rfix"])
+    if ([testitem.testName containsString:@"_Vmeas"] || [testitem.testName containsString:@"_Rref"] || [testitem.testName containsString:@"_Cfix"] || [testitem.testName containsString:@"_Vs"] || [testitem.testName containsString:@"_Cref"] || [testitem.testName containsString:@"_Rdut"] || [testitem.testName containsString:@"_Cdut"] || [testitem.testName containsString:@"_Rfix"]||[testitem.testName containsString:@"ISOLATION"])
     {
         testvalue=[NSString stringWithFormat:@"%@",store_Dic[[NSString stringWithFormat:@"%@",testitem.testName]]];
-        
         NSLog(@"打印多长的时间==========%@",testvalue);
-        
-        
-    
+
     }
     
-    
-   
     
 //判断值得大小
 #pragma mark--------对测试出来的结果进行判断和赋值
@@ -1069,19 +1072,22 @@ NSString  *param_path=@"Param";
         ispass = NO;
         PF = NO;
     }
-    
     //对时间进行赋值
     endTime = [timeDay getCurrentSecond];
     testitem.startTime = startTime;
     testitem.endTime   = endTime;
     
     
-    
-    
     //处理相关的测试项
-    [TestValueArr addObject:testvalue];
-    [ItemArr addObject:testitem];      //将测试项加入数组中
-
+    if (!(testvalue==NULL)) {
+        [ItemArr addObject:testitem];      //将测试项加入数组中
+        [testAppendString appendFormat:@"%@,",testvalue];
+        
+        if (fix_type==1) [testResultAppendStr appendFormat:@"%@,",testitem.result1];
+        if (fix_type==2) [testResultAppendStr appendFormat:@"%@,",testitem.result2];
+        if (fix_type==3) [testResultAppendStr appendFormat:@"%@,",testitem.result3];
+        if (fix_type==4) [testResultAppendStr appendFormat:@"%@,",testitem.result4];
+    }
     return ispass;
 }
 
@@ -1092,25 +1098,22 @@ NSString  *param_path=@"Param";
 -(void)SaveCSV:(FileCSV *)csvFile withBool:(BOOL)need_title
 {
     NSString * line    =  @"";
-    NSString * result =  @"";
     NSString * value  =  @"";
     
     for(int i=0;i<[ItemArr count];i++)
     {
         Item *testitem=ItemArr[i];
         
-        if (fix_type == 1) {result = testitem.result1,value   =testitem.value1;}
-        if (fix_type == 2) {result = testitem.result2,value   =testitem.value2;}
-        if (fix_type == 3) {result = testitem.result3,value   =testitem.value3;}
-        if (fix_type == 4) {result = testitem.result4,value   =testitem.value4;}
+        if (fix_type == 1) {value  = testitem.value1;}
+        if (fix_type == 2) {value  = testitem.value2;}
+        if (fix_type == 3) {value  = testitem.value3;}
+        if (fix_type == 4) {value  = testitem.value4;}
         
         if(testitem.isTest)  //需要测试的才需要上传
         {
             if((testitem.isShow == YES)&&(testitem.isTest))    //需要显示并且需要测试的才保存
             {
-                
                 line=[line stringByAppendingString:[NSString stringWithFormat:@"%@,",value]];
-                
             }
         }
     }
@@ -1126,26 +1129,26 @@ NSString  *param_path=@"Param";
     {
         test_result = @"FAIL";
     }
-    //line字符串前面增加SN和测试结果
-    NSString *  contentStr = [NSMutableString stringWithFormat:@"\n%@,%@,%@,%@,%@,%@,%@,%@,%@,%@,%@",start_time,end_time,[self.Config_Dic objectForKey:kSoftwareVersion],self.NestID,@"Cr",self.Config_pro,self.dut_sn,test_result,FixtureID,[self.Config_Dic objectForKey:kOperator_ID],line];
     
+    NSString *  contentStr = [NSMutableString stringWithFormat:@"\n%@,%@,%@,%@,%@,%@,%@%@,%@",self.dut_sn,test_result,@"Cr",companyName,self.NestID,self.Config_pro,line,start_time,end_time];
+
     NSMutableString  * contentString = [NSMutableString stringWithString:contentStr];
     
-    
+
     //如果addDcr=YES,加数据加到contentString中
-    if (addDcr) {
-        
+    if (addDcr)
+    {
           [contentString appendString:[NSString stringWithFormat:@"%@",dcrAppendString]];
-        
     }
     
-    
-    
-    
-   if(need_title == YES)[csvFile CSV_Write:self.csvTitle];
+    if(need_title == YES){
+        
+        NSString   * titleString = [NSString stringWithFormat:@"Version:,%@\n%@",[self.Config_Dic objectForKey:kSoftwareVersion],self.csvTitle];
+        
+        [csvFile CSV_Write:titleString];
+    }
     
     [csvFile CSV_Write:contentString];
-    
 }
 
 
@@ -1178,46 +1181,32 @@ NSString  *param_path=@"Param";
 -(void)NSThreadStart_Notification:(NSNotification *)noti
 {
     
-    index = 2;
+    [TestItemArr removeAllObjects];
     
+    if ((Instrument&&self.isTest)||isDebug) {
+        
+        index = 2;
+    }
+    else //发送通知，测试已经结束，传数值过去
+    {
+        [[NSNotificationCenter defaultCenter] postNotificationName:SNChangeNotice object:[NSString stringWithFormat:@"%dFX",fix_type] userInfo:nil];
+    }
 }
 
--(void)NSThreadEnd_Notification:(NSNotification *)noti
-{
-    
-    index = 1000;
-}
-
-
-//监测空测试时的消息
+#pragma mark================空测试时，公司默认为NULL
 -(void)selectNullTestNoti:(NSNotification *)noti
 {
-    if ([noti.object isEqualToString:@"YES"]) {
-        
+    if ([noti.object isEqualToString:@"NullTest"])
+    {
          nulltest = YES;
+         companyName = @"NULL";
     }
-    else{
-    
+    else
+    {
          nulltest = NO;
     }
-   
 }
 
--(void)selectPDCANoti:(NSNotification *)noti
-{
-    
-    if ([noti.name isEqualToString:kPdcaUploadNotice]) {
-        
-        if ([noti.object isEqualToString:@"YES"]) {
-            
-            isPDCA = YES;
-        }
-        else
-        {
-            isPDCA = NO;
-        }
-    }
-}
 
 -(void)writeNullValueToPlist:(NSNotification *)noti
 {
@@ -1244,7 +1233,11 @@ NSString  *param_path=@"Param";
          NSLog(@"%d-----%@==%@===%@===%@===%@",fix_type,updateItem.fix_ABC_DEF_Res,updateItem.fix_B2_E2_Res,updateItem.fix_B4_E4_Res,updateItem.fix_B_E_Res,updateItem.fix_Cap);
     }
     
-    exit(0);
+    [agilentB2987A CloseDevice];
+    [agilentE4980A CloseDevice];
+    //空测试完
+    [[NSNotificationCenter defaultCenter] postNotificationName:kFinshNullTestNotice object:nil];
+    
 }
 
 
@@ -1271,25 +1264,30 @@ NSString  *param_path=@"Param";
 #pragma mark--------------监听公司名称的改变
 -(void)selectCompanyNotice:(NSNotification *)noti
 {
-  
     companyName = noti.object;
- 
 }
-
-
 
 
 #pragma mark-----------------多次测试和的值
 -(void)add_RFixture_Value_To_Sum_Testname:(NSString *)testname RFixture:(double)RFixture
 {
     NSString *largeRes= @">1TOhm";
-    if ([testname isEqualToString:@"B_E_DCR"])         B_E_Sum   = B_E_Sum + RFixture;
-    if ([testname isEqualToString:@"B2_E2_DCR"])       B2_E2_Sum = B2_E2_Sum + RFixture;
-    if ([testname isEqualToString:@"B4_E4_DCR"])       B4_E4_Sum = B4_E4_Sum + RFixture;
-    if ([testname isEqualToString:@"ABC_DEF_DCR"])     ABC_DEF_Sum =ABC_DEF_Sum + RFixture;
+    if ([testname isEqualToString:@"B_E_DCR"])                   B_E_Sum   = B_E_Sum + fabs(RFixture);
+    if ([testname isEqualToString:@"B2_E2_DCR"])                 B2_E2_Sum = B2_E2_Sum + fabs(RFixture);
+    if ([testname isEqualToString:@"H203_BC_B4_E4_DCR_X"])       B4_E4_Sum = B4_E4_Sum + fabs(RFixture);
+    if ([testname isEqualToString:@"ABC_DEF_DCR"])               ABC_DEF_Sum =ABC_DEF_Sum + fabs(RFixture);
     
-    [store_Dic setValue:[NSString stringWithFormat:@"%@",largeRes] forKey:[NSString stringWithFormat:@"%@_Rdut",testname]];
-    [store_Dic setValue:[NSString stringWithFormat:@"%.3f",RFixture] forKey:[NSString stringWithFormat:@"%@_Rfix",testname]];
+    
+    if ([testname isEqualToString:@"H203_BC_B4_E4_DCR_X"]) {
+        
+        [store_Dic setValue:[NSString stringWithFormat:@"%@",largeRes] forKey:@"H109_BC_ISOLATION_R_DC"];
+        [store_Dic setValue:[NSString stringWithFormat:@"%.3f",RFixture] forKey:@"H204_BC_B4_E4_DCR_Rfix_X"];
+    }
+    else
+    {
+        [store_Dic setValue:[NSString stringWithFormat:@"%@",largeRes] forKey:[NSString stringWithFormat:@"%@_Rdut",testname]];
+        [store_Dic setValue:[NSString stringWithFormat:@"%.3f",RFixture] forKey:[NSString stringWithFormat:@"%@_Rfix",testname]];
+    }
 }
 
 
@@ -1298,7 +1296,7 @@ NSString  *param_path=@"Param";
 -(void)storeValueToDic_with_name:(NSString *)testname
 {
     double Rdut,Rfixture;
-    NSString *largeRes=@">1TOhm";
+    NSString *largeRes=@"1001";
     Rfixture=num*1E-9;
 
     if ([testname isEqualToString:@"B_E_DCR"]) {
@@ -1307,7 +1305,7 @@ NSString  *param_path=@"Param";
     if ([testname isEqualToString:@"B2_E2_DCR"]) {
         Rfixture = [updateItem.fix_B2_E2_Res floatValue];
     }
-    if ([testname isEqualToString:@"B4_E4_DCR"]) {
+    if ([testname isEqualToString:@"H203_BC_B4_E4_DCR_X"]) {
          Rfixture = [updateItem.fix_B4_E4_Res floatValue];
     }
     if ([testname isEqualToString:@"ABC_DEF_DCR"]) {
@@ -1317,23 +1315,63 @@ NSString  *param_path=@"Param";
     Rdut=(num*1E-9*Rfixture)/(Rfixture-num*1E-9);
     
     
-    if (param.isDebug) {
+    if (isDebug) {
         
         Rdut = arc4random()%100;
     }
     
-    if (num*1E-9 >= Rfixture || Rdut > 1000 || num*1E-9 < 0)
-    {
-        [store_Dic setValue:[NSString stringWithFormat:@"%@",largeRes] forKey:[NSString stringWithFormat:@"%@_Rdut",testname]];
+    if ([testname isEqualToString:@"H203_BC_B4_E4_DCR_X"]) {
+        
+        //提示空测
+        if (num*1E-9 >= Rfixture) {
+            self.isShow = YES;
+        }
+        
+        //DCR为负值，超过量程，Rdut显示1001
+        //DCR为正值，DCR-Rfix>0,Rdut显示-999
+        //DCR为正值, DCR-Rfix<0,正常计算
+        
+        if (num*1E-9<0) {
+           
+            [store_Dic setValue:[NSString stringWithFormat:@"%@",@"1001"] forKey:@"H109_BC_ISOLATION_R_DC"];
+        }
+        else
+        {
+            if (num*1E-9>=Rfixture) {
+                
+                 [store_Dic setValue:[NSString stringWithFormat:@"%@",@"-999"] forKey:@"H109_BC_ISOLATION_R_DC"];
+            }
+            else
+            {
+                if (Rdut >=1000)
+                {
+                    
+                    [store_Dic setValue:[NSString stringWithFormat:@"%@",@"1001"] forKey:@"H109_BC_ISOLATION_R_DC"];
+                }
+                if (Rdut<1000&&Rdut>0) {
+                    [store_Dic setValue:[NSString stringWithFormat:@"%f",Rdut] forKey:@"H109_BC_ISOLATION_R_DC"];
+                }
+            }
+            
+        }
+        [store_Dic setValue:[NSString stringWithFormat:@"%.3f",Rfixture] forKey:@"H204_BC_B4_E4_DCR_Rfix_X"];
+        
     }
     else
     {
-        [store_Dic setValue:[NSString stringWithFormat:@"%.3f",Rdut] forKey:[NSString stringWithFormat:@"%@_Rdut",testname]];
+    
+        if (num*1E-9>= Rfixture || Rdut > 1000 || num*1E-9 < 0)
+        {
+            [store_Dic setValue:[NSString stringWithFormat:@"%@",largeRes] forKey:[NSString stringWithFormat:@"%@_Rdut",testname]];
+        }
+        else
+        {
+            [store_Dic setValue:[NSString stringWithFormat:@"%.3f",Rdut] forKey:[NSString stringWithFormat:@"%@_Rdut",testname]];
+        }
+        
+        [store_Dic setValue:[NSString stringWithFormat:@"%.3f",Rfixture] forKey:[NSString stringWithFormat:@"%@_Rfix",testname]];
+    
     }
-    
-     [store_Dic setValue:[NSString stringWithFormat:@"%.3f",Rfixture] forKey:[NSString stringWithFormat:@"%@_Rfix",testname]];
-
-    
 }
 
 
@@ -1344,23 +1382,42 @@ NSString  *param_path=@"Param";
     NSString *smallCap=@"<1fF";
     NSString *largeACR=@">100GOhm";
     Cfix=[updateItem.fix_Cap floatValue];
-    Cdut=num*1E+12-Cfix;
+    Cdut=fabs(num*1E+12-Cfix);
     Rdut=1E+6/(Cdut*2*3.14159*item.freq.integerValue);
     
-    if (Cdut <= 0)
-    {
-        [store_Dic setValue:[NSString stringWithFormat:@"%@",smallCap] forKey:[NSString stringWithFormat:@"%@_Cdut",item.testName]];
-        [store_Dic setValue:[NSString stringWithFormat:@"%@",largeACR] forKey:[NSString stringWithFormat:@"%@_Rdut",item.testName]];
+    if ([item.testName isEqualToString:@"H200_BC_B4_E4_ACR_1000_X"]) {
+        
+            if (Cdut <= 0)
+            {
+                [store_Dic setValue:[NSString stringWithFormat:@"%@",smallCap] forKey:@"H202_BC_B4_E4_ACR_1000_Cdut_X"];
+                [store_Dic setValue:[NSString stringWithFormat:@"%@",largeACR] forKey:@"H108_BC_ISOLATION_Z_AC"];
+            }
+            else
+            {
+                [store_Dic setValue:[NSString stringWithFormat:@"%.3f",Cdut] forKey:@"H202_BC_B4_E4_ACR_1000_Cdut_X"];
+                [store_Dic setValue:[NSString stringWithFormat:@"%.3f",Rdut] forKey:@"H108_BC_ISOLATION_Z_AC"];
+            }
+        
+            [store_Dic setValue:[NSString stringWithFormat:@"%.3f",Cfix] forKey:@"H201_BC_B4_E4_ACR_1000_Cfix_X"];
     }
     else
     {
-        [store_Dic setValue:[NSString stringWithFormat:@"%f",Cdut] forKey:[NSString stringWithFormat:@"%@_Cdut",item.testName]];
-        [store_Dic setValue:[NSString stringWithFormat:@"%f",Rdut] forKey:[NSString stringWithFormat:@"%@_Rdut",item.testName]];
-        
-    }
     
-    [store_Dic setValue:[NSString stringWithFormat:@"%.3f",Cfix] forKey:[NSString stringWithFormat:@"%@_Cfix",item.testName]];
-
+        
+        if (Cdut <= 0)
+        {
+            [store_Dic setValue:[NSString stringWithFormat:@"%@",smallCap] forKey:[NSString stringWithFormat:@"%@_Cdut",item.testName]];
+            [store_Dic setValue:[NSString stringWithFormat:@"%@",largeACR] forKey:[NSString stringWithFormat:@"%@_Rdut",item.testName]];
+        }
+        else
+        {
+            [store_Dic setValue:[NSString stringWithFormat:@"%f",Cdut] forKey:[NSString stringWithFormat:@"%@_Cdut",item.testName]];
+            [store_Dic setValue:[NSString stringWithFormat:@"%f",Rdut] forKey:[NSString stringWithFormat:@"%@_Rdut",item.testName]];
+            
+        }
+        
+        [store_Dic setValue:[NSString stringWithFormat:@"%.3f",Cfix] forKey:[NSString stringWithFormat:@"%@_Cfix",item.testName]];
+    }
 }
 
 
@@ -1444,11 +1501,34 @@ NSString  *param_path=@"Param";
 }
 
 
-#pragma mark ===============唤醒2987A
--(void)timewake
+
+#pragma mark ===============写入Log文件
+-(void)writeTestLog:(int)fixtype withString:(NSString *)writeString
 {
-     [agilentB2987A WriteLine:@"*RST" andCommunicateType:AgilentB2987A_USB_Type];
+   
+    if (fix_type==1) {
+        
+        [txt_file TXT_Write:[NSString stringWithFormat:@"%@:A Solt-->%@\n",[timeDay getFileTime], writeString]];
+    }
+    else if (fix_type==2)
+    {
+        [txt_file TXT_Write:[NSString stringWithFormat:@"%@:B Solt-->%@\n",[timeDay getFileTime],writeString]];
+    }
+    else if (fix_type==3)
+    {
+        [txt_file TXT_Write:[NSString stringWithFormat:@"%@:C Solt-->%@\n",[timeDay getFileTime],writeString]];
+    }
+    else if (fix_type==4)
+    {
+        [txt_file TXT_Write:[NSString stringWithFormat:@"%@:D Solt-->%@\n",[timeDay getFileTime],writeString]];
+    }
+    else
+    {
+        
+    }
 }
+
+
 
 
 

@@ -34,14 +34,11 @@
     NSMutableArray  *  arr_4980;                       //e4980数组
     NSMutableArray  *  arr_2987;                       //2987A数组
     NSMutableDictionary  * dictionary;                 //从param文件中读取的全局字典
-    
-    
 }
 
 @end
 
 @implementation ConfigInstr
-
 
 
 
@@ -53,29 +50,21 @@
 
 
 
-
-
 - (void)windowDidLoad {
     [super windowDidLoad];
     
     
      aglientTools =[AgilentTools Instance];
-     arr_4980 = [[NSMutableArray alloc]initWithCapacity:10];
-     arr_2987 = [[NSMutableArray alloc]initWithCapacity:10];
+     arr_4980 = [[NSMutableArray alloc] initWithCapacity:10];
+     arr_2987 = [[NSMutableArray alloc] initWithCapacity:10];
     
     
-    NSArray  *  arr =[aglientTools getUsbArray];
-//    for (NSString * agilentString in arr)
-//    {
-//        if ([agilentString containsString:@"0x0909"])
-//        {
-//            [arr_4980 addObject:agilentString];
-//        }
-//        else
-//        {
-//            [arr_2987 addObject:agilentString];
-//        }
-//    }
+    NSArray  *  array =[aglientTools getUsbArray];
+    
+    NSMutableArray  * arr = [NSMutableArray arrayWithArray:array];
+    [arr addObject:@"NULL"];
+    
+    
     
     //显示在界面PopButton按钮上
     [PopButton_2987A addItemsWithTitles:arr];
@@ -127,10 +116,6 @@
 }
 
 
-
-
-
-
 - (IBAction)Bind_Fix_InStrument:(id)sender {
     
    //将选择的仪器仪表写入param plist文件中
@@ -163,8 +148,15 @@
   
     [dictionary writeToFile:plistPath atomically:YES];
     
+    
+    //绑定完仪器仪表存在沙盒中
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"IsBind"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    
+    
     //设置完后退出软件
-      exit(0);
+    exit(0);
 }
 
 

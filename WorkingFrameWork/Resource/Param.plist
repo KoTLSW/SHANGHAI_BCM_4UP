@@ -138,7 +138,7 @@
 	<key>sw_name</key>
 	<string>BCM_OQC_Station</string>
 	<key>sw_ver</key>
-	<string>V2.0.1BCM</string>
+	<string>V2.1.6GD</string>
 	<key>waveFrequence</key>
 	<string>1000</string>
 	<key>waveOffset</key>

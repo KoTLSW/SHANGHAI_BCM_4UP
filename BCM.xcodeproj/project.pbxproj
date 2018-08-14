@@ -19,6 +19,7 @@
 		040CAE91204FE3DC00572160 /* GetTimeDay.m in Sources */ = {isa = PBXBuildFile; fileRef = 040CAE8C204FE3DC00572160 /* GetTimeDay.m */; };
 		040CAE92204FE3DC00572160 /* TestStep.m in Sources */ = {isa = PBXBuildFile; fileRef = 040CAE8E204FE3DC00572160 /* TestStep.m */; };
 		040CAE9A2053D40B00572160 /* Lock.m in Sources */ = {isa = PBXBuildFile; fileRef = 040CAE992053D40B00572160 /* Lock.m */; };
+		040F1D1120A1F4A60001A53C /* Alert.m in Sources */ = {isa = PBXBuildFile; fileRef = 040F1D1020A1F4A60001A53C /* Alert.m */; };
 		0410A90F204C05700080F745 /* UpdateItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 0410A90E204C05700080F745 /* UpdateItem.m */; };
 		0422B4B01FE2252C0096DCC1 /* GlobalVar.m in Sources */ = {isa = PBXBuildFile; fileRef = 0422B4AF1FE2252C0096DCC1 /* GlobalVar.m */; };
 		0422B4C01FE2643C0096DCC1 /* VISA.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D599D7E1FA9990C0023F29F /* VISA.framework */; };
@@ -48,9 +49,6 @@
 		5B13F3E420157F63004C14AE /* Station_Cr_1_Humid.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B13F3D820157F63004C14AE /* Station_Cr_1_Humid.plist */; };
 		5B13F3E620157F63004C14AE /* Station_Cr_2_Humid.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B13F3DA20157F63004C14AE /* Station_Cr_2_Humid.plist */; };
 		5B13F3E820157F63004C14AE /* Station_Cr_3_Humid.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B13F3DC20157F63004C14AE /* Station_Cr_3_Humid.plist */; };
-		5B13F3EA20157F63004C14AE /* Station_Ti_1_Humid.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B13F3DE20157F63004C14AE /* Station_Ti_1_Humid.plist */; };
-		5B13F3EC20157F63004C14AE /* Station_Ti_2_Humid.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B13F3E020157F63004C14AE /* Station_Ti_2_Humid.plist */; };
-		5B13F3EE20157F63004C14AE /* Station_Ti_3_Humid.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B13F3E220157F63004C14AE /* Station_Ti_3_Humid.plist */; };
 		5B13F3F420158000004C14AE /* AgilentB2987A.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B13F3F120158000004C14AE /* AgilentB2987A.m */; };
 		5B13F3F520158000004C14AE /* AgilentE4980A.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B13F3F320158000004C14AE /* AgilentE4980A.m */; };
 		5B13F3FB2015810B004C14AE /* Param.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B13F3FA2015810B004C14AE /* Param.m */; };
@@ -81,6 +79,8 @@
 		040CAE8E204FE3DC00572160 /* TestStep.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestStep.m; sourceTree = "<group>"; };
 		040CAE982053D40B00572160 /* Lock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Lock.h; sourceTree = "<group>"; };
 		040CAE992053D40B00572160 /* Lock.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Lock.m; sourceTree = "<group>"; };
+		040F1D0F20A1F4A60001A53C /* Alert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Alert.h; sourceTree = "<group>"; };
+		040F1D1020A1F4A60001A53C /* Alert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Alert.m; sourceTree = "<group>"; };
 		0410A90D204C05700080F745 /* UpdateItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UpdateItem.h; sourceTree = "<group>"; };
 		0410A90E204C05700080F745 /* UpdateItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UpdateItem.m; sourceTree = "<group>"; };
 		0422B4AE1FE2252C0096DCC1 /* GlobalVar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GlobalVar.h; sourceTree = "<group>"; };
@@ -137,9 +137,6 @@
 		5B13F3D820157F63004C14AE /* Station_Cr_1_Humid.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Station_Cr_1_Humid.plist; sourceTree = "<group>"; };
 		5B13F3DA20157F63004C14AE /* Station_Cr_2_Humid.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Station_Cr_2_Humid.plist; sourceTree = "<group>"; };
 		5B13F3DC20157F63004C14AE /* Station_Cr_3_Humid.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Station_Cr_3_Humid.plist; sourceTree = "<group>"; };
-		5B13F3DE20157F63004C14AE /* Station_Ti_1_Humid.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Station_Ti_1_Humid.plist; sourceTree = "<group>"; };
-		5B13F3E020157F63004C14AE /* Station_Ti_2_Humid.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Station_Ti_2_Humid.plist; sourceTree = "<group>"; };
-		5B13F3E220157F63004C14AE /* Station_Ti_3_Humid.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Station_Ti_3_Humid.plist; sourceTree = "<group>"; };
 		5B13F3F020158000004C14AE /* AgilentB2987A.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AgilentB2987A.h; sourceTree = "<group>"; };
 		5B13F3F120158000004C14AE /* AgilentB2987A.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AgilentB2987A.m; sourceTree = "<group>"; };
 		5B13F3F220158000004C14AE /* AgilentE4980A.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AgilentE4980A.h; sourceTree = "<group>"; };
@@ -210,6 +207,15 @@
 			path = SFC;
 			sourceTree = "<group>";
 		};
+		040F1D0E20A1F4A60001A53C /* showWindow */ = {
+			isa = PBXGroup;
+			children = (
+				040F1D0F20A1F4A60001A53C /* Alert.h */,
+				040F1D1020A1F4A60001A53C /* Alert.m */,
+			);
+			path = showWindow;
+			sourceTree = "<group>";
+		};
 		04A423921FA360D500838C6F = {
 			isa = PBXGroup;
 			children = (
@@ -229,6 +235,7 @@
 		04A4239D1FA360D500838C6F /* BCM */ = {
 			isa = PBXGroup;
 			children = (
+				040F1D0E20A1F4A60001A53C /* showWindow */,
 				040CAE86204FE38E00572160 /* SFC */,
 				040763152043F33600F11430 /* ConfigInstrument */,
 				5BFD2048202A82B600685EC4 /* LoginWindow */,
@@ -296,9 +303,6 @@
 				5B13F3D820157F63004C14AE /* Station_Cr_1_Humid.plist */,
 				5B13F3DA20157F63004C14AE /* Station_Cr_2_Humid.plist */,
 				5B13F3DC20157F63004C14AE /* Station_Cr_3_Humid.plist */,
-				5B13F3DE20157F63004C14AE /* Station_Ti_1_Humid.plist */,
-				5B13F3E020157F63004C14AE /* Station_Ti_2_Humid.plist */,
-				5B13F3E220157F63004C14AE /* Station_Ti_3_Humid.plist */,
 				04A423DD1FA40D7F00838C6F /* Param.plist */,
 			);
 			path = Resource;
@@ -469,12 +473,9 @@
 				0407631A2043F37200F11430 /* ConfigInstr.xib in Resources */,
 				04A423B71FA3613B00838C6F /* Table.xib in Resources */,
 				5B13F3E420157F63004C14AE /* Station_Cr_1_Humid.plist in Resources */,
-				5B13F3EA20157F63004C14AE /* Station_Ti_1_Humid.plist in Resources */,
-				5B13F3EE20157F63004C14AE /* Station_Ti_3_Humid.plist in Resources */,
 				04A423A81FA360D500838C6F /* Assets.xcassets in Resources */,
 				04A423AB1FA360D500838C6F /* Main.storyboard in Resources */,
 				040739B720635604002A8B16 /* FileConfigSet.xib in Resources */,
-				5B13F3EC20157F63004C14AE /* Station_Ti_2_Humid.plist in Resources */,
 				5B13F3E820157F63004C14AE /* Station_Cr_3_Humid.plist in Resources */,
 				5B13F3E620157F63004C14AE /* Station_Cr_2_Humid.plist in Resources */,
 			);
@@ -490,6 +491,7 @@
 				0422B4B01FE2252C0096DCC1 /* GlobalVar.m in Sources */,
 				040493141FBABE4E000A7330 /* SerialPort.m in Sources */,
 				04A423FF1FA4610500838C6F /* HiperTimer.m in Sources */,
+				040F1D1120A1F4A60001A53C /* Alert.m in Sources */,
 				04A424021FA4610500838C6F /* TimeDate.m in Sources */,
 				04A424261FA71E4500838C6F /* FileCSV.m in Sources */,
 				04A424281FA71E4500838C6F /* Folder.m in Sources */,
@@ -573,7 +575,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -612,7 +614,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-8";
@@ -643,6 +645,7 @@
 				OTHER_LDFLAGS = "-all_load";
 				PRODUCT_BUNDLE_IDENTIFIER = Ab.BCM;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx10.12;
 			};
 			name = Debug;
 		};
@@ -670,6 +673,7 @@
 				OTHER_LDFLAGS = "-all_load";
 				PRODUCT_BUNDLE_IDENTIFIER = Ab.BCM;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx10.12;
 			};
 			name = Release;
 		};

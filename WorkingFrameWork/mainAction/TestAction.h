@@ -28,8 +28,6 @@
 #import "TestStep.h"
 
 
-
-
 @interface TestAction : NSObject
 @property(nonatomic,strong)Table  * tab;
 @property(nonatomic,strong)NSTextField  * resultTF;
@@ -65,11 +63,15 @@
 
 
 @property(nonatomic,strong)NSString     * instr_4980;
-@property(nonatomic,strong)NSString     * instr_2987;          
+@property(nonatomic,strong)NSString     * instr_2987;
+
+
+@property(nonatomic,assign)BOOL           isTest;                //当前是否测试
+@property(nonatomic,assign)BOOL           isShow;                //显示提示重新空测
 
 
 //==================================
--(id)initWithTable:(Table *)tab withFixDic:(NSDictionary *)fix withFileDir:(NSString *)foldDir withType:(int)type_num;
+-(id)initWithTable:(Table *)tab withFixParam:(Param *)param withType:(int)type_num;
 -(void)TestAction; //测试流程
 -(void)setDut_sn:(NSString *)dut_sn;
 -(void)setCsvTitle:(NSString *)csvTitle;

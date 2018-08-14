@@ -17,33 +17,46 @@
 }
 @end
 //==========================================
+
+
 @implementation PDCA
 //==========================================
 -(void)PDCA_GetStartTime
 {
     time(&time_start);
 }
+
+
 //==========================================
 -(void)PDCA_GetEndTime
 {
     time(&time_end);
 }
+
+
 //==========================================
 -(void)PDCA_Init:(NSString*)sn SW_name:(NSString*)sw_name SW_ver:(NSString*)sw_ver
 {
-    IP_reply_destroy(IP_UUTStart(&UID));
+    
+    reply = IP_UUTStart(&UID);
+    
+    
+    IP_reply_destroy(reply);
     IP_reply_destroy(IP_addAttribute(UID, IP_ATTRIBUTE_SERIALNUMBER, [sn UTF8String]));
     IP_reply_destroy(IP_addAttribute(UID, IP_ATTRIBUTE_STATIONSOFTWARENAME, [sw_name UTF8String]));
     IP_reply_destroy(IP_addAttribute(UID, IP_ATTRIBUTE_STATIONSOFTWAREVERSION, [sw_ver UTF8String]));
     
     IP_reply_destroy(IP_setStartTime(UID,time_start));
 }
+
+
 //==========================================
 -(void)PDCA_AddAttribute:(NSString*)sbuild FixtureID:(NSString*)fixtureid
 {
     IP_reply_destroy(IP_addAttribute(UID, IP_ATTRIBUTE_SPECIAL_BUILD , [sbuild UTF8String]));
     IP_reply_destroy(IP_addAttribute(UID, IP_ATTRIBUTE_FIXTURE_ID , [fixtureid UTF8String]));
 }
+
 //==========================================
 -(void)PDCA_UploadPass:(NSString*)test_name
 {
@@ -61,6 +74,7 @@
     IP_testSpec_destroy(testSpec);
     
 }
+
 //==========================================
 -(void)PDCA_UploadFail:(NSString*)test_name Message:(NSString*)message
 {
@@ -79,6 +93,7 @@
     IP_testSpec_destroy(testSpec);
     
 }
+
 //==========================================
 -(void)PDCA_UploadValue:(NSString*)test_name Lower:(NSString*)lower Upper:(NSString*)upper Unit:(NSString*)units Value:(NSString*)value Pass_Fail:(BOOL)pass_fail
 {
@@ -127,12 +142,13 @@
     
 }
 
-
 //==========================================
 -(BOOL) AddBlob:(NSString*) fileName FilePath:(NSString*) filePath
 {
     BOOL flag = NO;
-    reply = IP_addBlob(UID, [fileName UTF8String], [filePath UTF8String]);
+    IP_UUTHandle UID1;
+    
+    reply = IP_addBlob(UID1, [fileName cStringUsingEncoding:1], [filePath cStringUsingEncoding:1]);
     
     if(IP_success(reply))
     {
@@ -153,7 +169,7 @@
     
     if(!flag)
     {
-        [self UIDCancel];
+       // [self UIDCancel];
     }
     
     return flag;

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10116" systemVersion="16G29" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10116" systemVersion="16G1314" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10116"/>
         <capability name="box content view" minToolsVersion="7.0"/>
@@ -10,18 +10,11 @@
                 <outlet property="LoopTestButton" destination="wz2-NV-IrI" id="LNY-XS-Els"/>
                 <outlet property="PdcaUploadButton" destination="WwV-dt-A0t" id="bRa-9c-VpO"/>
                 <outlet property="SfcUploadButton" destination="Woq-pw-sdO" id="Yar-XE-vgQ"/>
-                <outlet property="Station_Large_config" destination="vP8-c9-f0t" id="WAT-DG-QzV"/>
-                <outlet property="cancelBtn" destination="NiP-eb-DBf" id="i33-7y-gJN"/>
-                <outlet property="config_button" destination="fUP-iC-AKj" id="we5-8z-i32"/>
                 <outlet property="enterBtn" destination="6TZ-7u-9T9" id="AL8-zF-vDv"/>
                 <outlet property="logInfo" destination="AEA-BD-YIY" id="U2b-4V-q3N"/>
                 <outlet property="nullTestButton" destination="0wO-SY-Nyb" id="cj0-aE-gHj"/>
-                <outlet property="passWord" destination="Rvf-jP-Ic4" id="5Pn-cu-wFq"/>
                 <outlet property="singleTestButton" destination="gUl-HM-gIh" id="zoS-ZP-L0b"/>
                 <outlet property="test_40_Data_button" destination="pGV-5Y-pIY" id="hTn-Ot-3Dn"/>
-                <outlet property="test_mode_button" destination="TUr-xG-jO8" id="lOA-Cp-oWa"/>
-                <outlet property="updata_Button" destination="1FA-0Y-dR5" id="qHX-zA-d3I"/>
-                <outlet property="userName" destination="Va6-HI-6An" id="8er-dc-uwy"/>
                 <outlet property="window" destination="F0z-JX-Cv5" id="gIp-Ho-8D9"/>
             </connections>
         </customObject>
@@ -30,43 +23,43 @@
         <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" animationBehavior="default" id="F0z-JX-Cv5">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="196" y="240" width="412" height="579"/>
+            <rect key="contentRect" x="196" y="240" width="347" height="465"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
             <view key="contentView" id="se5-gp-TjO">
-                <rect key="frame" x="0.0" y="0.0" width="412" height="579"/>
+                <rect key="frame" x="0.0" y="0.0" width="347" height="465"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <box fixedFrame="YES" title="测试模式" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="p8C-xp-ptS">
-                        <rect key="frame" x="17" y="489" width="377" height="80"/>
+                    <box fixedFrame="YES" title="测试模式" borderType="bezel" translatesAutoresizingMaskIntoConstraints="NO" id="p8C-xp-ptS">
+                        <rect key="frame" x="13" y="329" width="326" height="116"/>
                         <view key="contentView" id="6kB-Pc-ND5">
-                            <rect key="frame" x="1" y="1" width="375" height="58"/>
+                            <rect key="frame" x="3" y="3" width="320" height="92"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0wO-SY-Nyb">
-                                    <rect key="frame" x="171" y="12" width="81" height="32"/>
-                                    <buttonCell key="cell" type="check" title="NullTest" bezelStyle="regularSquare" imagePosition="left" enabled="NO" inset="2" id="L5e-LR-mGM">
+                                    <rect key="frame" x="185" y="46" width="117" height="32"/>
+                                    <buttonCell key="cell" type="check" title="    Null-Test" bezelStyle="regularSquare" imagePosition="left" alignment="center" enabled="NO" inset="2" id="L5e-LR-mGM">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="system"/>
+                                        <font key="font" metaFont="system" size="15"/>
                                     </buttonCell>
                                     <connections>
                                         <action selector="choose_TestMode:" target="-2" id="Krk-wC-KaJ"/>
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gUl-HM-gIh">
-                                    <rect key="frame" x="18" y="12" width="92" height="32"/>
-                                    <buttonCell key="cell" type="check" title="SingleTest" bezelStyle="regularSquare" imagePosition="left" enabled="NO" inset="2" id="hFm-TE-HHJ">
+                                    <rect key="frame" x="18" y="46" width="121" height="32"/>
+                                    <buttonCell key="cell" type="check" title="    Single-Test" bezelStyle="regularSquare" imagePosition="left" alignment="center" enabled="NO" inset="2" id="hFm-TE-HHJ">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="system"/>
+                                        <font key="font" metaFont="system" size="15"/>
                                     </buttonCell>
                                     <connections>
                                         <action selector="choose_TestMode:" target="-2" id="g27-fO-Zwj"/>
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wz2-NV-IrI">
-                                    <rect key="frame" x="290" y="12" width="81" height="32"/>
-                                    <buttonCell key="cell" type="check" title="LoopTest" bezelStyle="regularSquare" imagePosition="left" enabled="NO" inset="2" id="5ca-dy-yqV">
+                                    <rect key="frame" x="18" y="12" width="112" height="32"/>
+                                    <buttonCell key="cell" type="check" title="    Loop-Test" bezelStyle="regularSquare" imagePosition="left" alignment="center" enabled="NO" inset="2" id="5ca-dy-yqV">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="system"/>
+                                        <font key="font" metaFont="system" size="15"/>
                                     </buttonCell>
                                     <connections>
                                         <action selector="choose_TestMode:" target="-2" id="PUW-ss-gyB"/>
@@ -74,197 +67,79 @@
                                 </button>
                             </subviews>
                         </view>
-                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                        <color key="borderColor" red="0.40924343470000002" green="1" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                        <font key="titleFont" metaFont="system" size="15"/>
-                    </box>
-                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6TZ-7u-9T9">
-                        <rect key="frame" x="107" y="47" width="100" height="39"/>
-                        <buttonCell key="cell" type="square" title="Enter" bezelStyle="shadowlessSquare" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="JfD-ly-Yg3">
-                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="system"/>
-                        </buttonCell>
-                        <connections>
-                            <action selector="clickToLogin:" target="-2" id="tlU-yV-Uxz"/>
-                        </connections>
-                    </button>
-                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="NiP-eb-DBf">
-                        <rect key="frame" x="291" y="47" width="100" height="39"/>
-                        <buttonCell key="cell" type="square" title="Cancel" bezelStyle="shadowlessSquare" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="iGs-U6-US2">
-                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="system"/>
-                        </buttonCell>
-                        <connections>
-                            <action selector="clockToCancel:" target="-2" id="x9J-JK-3OA"/>
-                        </connections>
-                    </button>
-                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8Im-qP-9xD">
-                        <rect key="frame" x="18" y="179" width="68" height="18"/>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="UserName:" id="PBy-nb-RPK">
-                            <font key="font" metaFont="system"/>
-                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
-                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="zgA-98-kPc">
-                        <rect key="frame" x="18" y="123" width="68" height="18"/>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="PassWord :" id="D3g-lX-zZz">
-                            <font key="font" metaFont="system"/>
-                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
-                    <box fixedFrame="YES" title="Company选择" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="0em-BW-Tld">
-                        <rect key="frame" x="17" y="314" width="377" height="74"/>
-                        <view key="contentView" id="GfW-G9-gZI">
-                            <rect key="frame" x="1" y="1" width="375" height="52"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                            <subviews>
-                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="JhA-cz-OCh">
-                                    <rect key="frame" x="13" y="22" width="68" height="18"/>
-                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="company:" id="m2a-8h-HfR">
-                                        <font key="font" size="14" name=".PingFangSC-Regular"/>
-                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                    </textFieldCell>
-                                </textField>
-                                <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vP8-c9-f0t">
-                                    <rect key="frame" x="85" y="15" width="91" height="26"/>
-                                    <popUpButtonCell key="cell" type="push" title="Beil" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" enabled="NO" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="8Yb-Am-IUe" id="MHb-ao-YhX">
-                                        <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="menu"/>
-                                        <menu key="menu" id="jQX-cr-KET">
-                                            <items>
-                                                <menuItem title="Beil" id="8Yb-Am-IUe"/>
-                                                <menuItem title="Lan" id="mfh-tL-ayn"/>
-                                            </items>
-                                        </menu>
-                                    </popUpButtonCell>
-                                </popUpButton>
-                            </subviews>
-                        </view>
-                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                        <font key="titleFont" metaFont="system" size="15"/>
+                        <font key="titleFont" metaFont="system" size="16"/>
                     </box>
                     <box fixedFrame="YES" title="数据上传" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="2Me-op-AXY">
-                        <rect key="frame" x="17" y="405" width="377" height="74"/>
+                        <rect key="frame" x="11" y="227" width="328" height="74"/>
                         <view key="contentView" id="o1u-Q6-5Fe">
-                            <rect key="frame" x="1" y="1" width="375" height="52"/>
+                            <rect key="frame" x="1" y="1" width="326" height="52"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Woq-pw-sdO">
-                                    <rect key="frame" x="18" y="13" width="102" height="32"/>
+                                    <rect key="frame" x="26" y="13" width="117" height="32"/>
                                     <buttonCell key="cell" type="check" title="SfcUpload" bezelStyle="regularSquare" imagePosition="left" alignment="center" enabled="NO" inset="2" id="ezI-4x-hjL">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="system"/>
+                                        <font key="font" metaFont="system" size="15"/>
                                     </buttonCell>
                                 </button>
                                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="WwV-dt-A0t">
-                                    <rect key="frame" x="170" y="13" width="102" height="32"/>
-                                    <buttonCell key="cell" type="check" title="PdcaUpload" bezelStyle="regularSquare" imagePosition="left" alignment="center" enabled="NO" state="on" inset="2" id="lUp-tb-t56">
+                                    <rect key="frame" x="190" y="13" width="118" height="32"/>
+                                    <buttonCell key="cell" type="check" title="PdcaUpload" bezelStyle="regularSquare" imagePosition="left" alignment="center" state="on" inset="2" id="lUp-tb-t56">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="system"/>
+                                        <font key="font" metaFont="system" size="15"/>
                                     </buttonCell>
                                 </button>
                             </subviews>
                         </view>
                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                        <font key="titleFont" metaFont="system" size="15"/>
+                        <font key="titleFont" metaFont="system" size="16"/>
                     </box>
-                    <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Va6-HI-6An">
-                        <rect key="frame" x="107" y="173" width="284" height="30"/>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="3Lq-2Q-e47">
-                            <font key="font" metaFont="system"/>
-                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
-                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TUr-xG-jO8">
-                        <rect key="frame" x="343" y="550" width="57" height="25"/>
-                        <buttonCell key="cell" type="check" title="Mode" bezelStyle="regularSquare" imagePosition="left" inset="2" id="M8o-P5-Ukv">
-                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                            <font key="font" metaFont="system"/>
-                        </buttonCell>
-                        <connections>
-                            <action selector="show_other_button:" target="-2" id="Ir9-pz-ft7"/>
-                        </connections>
-                    </button>
-                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1FA-0Y-dR5">
-                        <rect key="frame" x="343" y="460" width="51" height="25"/>
-                        <buttonCell key="cell" type="check" title="Data" bezelStyle="regularSquare" imagePosition="left" inset="2" id="qUw-Yl-XRG">
-                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                            <font key="font" metaFont="system"/>
-                        </buttonCell>
-                        <connections>
-                            <action selector="show_other_button:" target="-2" id="XkI-3k-HL5"/>
-                        </connections>
-                    </button>
-                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fUP-iC-AKj">
-                        <rect key="frame" x="343" y="369" width="65" height="25"/>
-                        <buttonCell key="cell" type="check" title="Com" bezelStyle="regularSquare" imagePosition="left" inset="2" id="AlQ-Yg-DeG">
-                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                            <font key="font" metaFont="system"/>
-                        </buttonCell>
-                        <connections>
-                            <action selector="show_other_button:" target="-2" id="Nb5-wO-KSt"/>
-                        </connections>
-                    </button>
                     <box fixedFrame="YES" title="Test数据" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="UNB-6V-UVF">
-                        <rect key="frame" x="17" y="220" width="377" height="80"/>
+                        <rect key="frame" x="11" y="119" width="328" height="80"/>
                         <view key="contentView" id="X0v-jR-6YD">
-                            <rect key="frame" x="1" y="1" width="375" height="58"/>
+                            <rect key="frame" x="1" y="1" width="326" height="58"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="pGV-5Y-pIY">
-                                    <rect key="frame" x="14" y="12" width="101" height="32"/>
-                                    <buttonCell key="cell" type="check" title="test_40_Data" bezelStyle="regularSquare" imagePosition="left" enabled="NO" inset="2" id="0jP-q9-xIy">
+                                    <rect key="frame" x="26" y="18" width="134" height="32"/>
+                                    <buttonCell key="cell" type="check" title="test_40_Data" bezelStyle="regularSquare" imagePosition="left" alignment="center" inset="2" id="0jP-q9-xIy">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="system"/>
+                                        <font key="font" metaFont="system" size="15"/>
                                     </buttonCell>
                                 </button>
                             </subviews>
                         </view>
                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                        <font key="titleFont" metaFont="system" size="15"/>
+                        <font key="titleFont" metaFont="system" size="16"/>
                     </box>
-                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Qrz-2z-A9T">
-                        <rect key="frame" x="341" y="280" width="52" height="32"/>
-                        <buttonCell key="cell" type="check" title="Test" bezelStyle="regularSquare" imagePosition="left" inset="2" id="7yY-Y7-6ms">
-                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                            <font key="font" metaFont="system"/>
-                        </buttonCell>
-                        <connections>
-                            <action selector="show_other_button:" target="-2" id="Z1w-3P-79H"/>
-                        </connections>
-                    </button>
                     <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="AEA-BD-YIY">
-                        <rect key="frame" x="2" y="0.0" width="410" height="34"/>
+                        <rect key="frame" x="2" y="-114" width="410" height="34"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" drawsBackground="YES" id="5Yx-us-aSH">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" red="0.90196079019999997" green="0.90196079019999997" blue="0.90196079019999997" alpha="1" colorSpace="calibratedRGB"/>
                         </textFieldCell>
                     </textField>
-                    <secureTextField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Rvf-jP-Ic4">
-                        <rect key="frame" x="107" y="116" width="284" height="32"/>
-                        <secureTextFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" usesSingleLineMode="YES" id="08m-2T-fl1">
-                            <font key="font" metaFont="system"/>
-                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                            <allowedInputSourceLocales>
-                                <string>NSAllRomanInputSourcesLocaleIdentifier</string>
-                            </allowedInputSourceLocales>
-                        </secureTextFieldCell>
-                    </secureTextField>
+                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6TZ-7u-9T9">
+                        <rect key="frame" x="112" y="40" width="146" height="39"/>
+                        <buttonCell key="cell" type="square" title="确认" bezelStyle="shadowlessSquare" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="JfD-ly-Yg3">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" size="13" name=".PingFangSC-Regular"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="clickToLogin:" target="-2" id="tlU-yV-Uxz"/>
+                        </connections>
+                    </button>
                 </subviews>
             </view>
             <connections>
                 <outlet property="delegate" destination="-2" id="0bl-1N-AYu"/>
             </connections>
-            <point key="canvasLocation" x="435" y="422.5"/>
+            <point key="canvasLocation" x="402.5" y="365.5"/>
         </window>
     </objects>
 </document>

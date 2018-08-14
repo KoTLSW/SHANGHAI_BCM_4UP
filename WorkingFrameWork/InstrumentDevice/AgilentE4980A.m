@@ -104,9 +104,11 @@
 {
     if (_isOpen) return YES;
     status = viOpen(defaultRM, instrDescriptor, VI_NULL,VI_NULL, &instr);
-    if (status==VI_SUCCESS) {
+    if (status==VI_SUCCESS)
+    {
         return YES;
-    }else
+    }
+    else
     {
         _isOpen=false;
         return NO;

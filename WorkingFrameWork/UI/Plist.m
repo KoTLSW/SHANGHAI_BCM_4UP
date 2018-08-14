@@ -35,6 +35,7 @@
     NSMutableString * titileString = [[NSMutableString alloc]initWithCapacity:10];
     NSMutableString * upperString  = [[NSMutableString alloc]initWithCapacity:10];
     NSMutableString * lowerString  = [[NSMutableString alloc] initWithCapacity:10];
+    NSMutableString * unitString   = [[NSMutableString alloc] initWithCapacity:10];
     
     
     //根据传入的关键字找到对应节点
@@ -74,6 +75,7 @@
             [titileString appendFormat:@"%@,",item.testName];
             [upperString appendFormat:@"%@,",item.max];
             [lowerString appendFormat:@"%@,",item.min];
+            [unitString appendFormat:@"%@,",item.units ];
 
             [testItems addObject:item];
         }
@@ -81,10 +83,10 @@
         //先移除空格,最后的逗号用“\n”符号替代
         [upperString replaceCharactersInRange:NSMakeRange(upperString.length-1, 1) withString:@"\n"];
         [lowerString replaceCharactersInRange:NSMakeRange(lowerString.length-1, 1) withString:@""];
+        [lowerString replaceCharactersInRange:NSMakeRange(lowerString.length-1, 1) withString:@""];
         
-        //拼接到暴露外界的字符串上
-         _titile = [NSMutableString stringWithFormat:@"%@%@%@",[@"Start_Time,End_Time,Version,NestID,Product_Type,Config,SN,TestResut,FixtureID,Operator_ID," stringByAppendingString:titileString],[@"\nMAX,,,,,,,,,,"  stringByAppendingString:upperString],[@"MIN,,,,,,,,,,"  stringByAppendingString:lowerString]];
-
+        
+         _titile = [NSMutableString stringWithFormat:@"%@%@%@%@%@",[@"SN,TestResult,Product_Type,Suppller,NEST_ID,Config," stringByAppendingString:titileString],@"Start_Time,End_Time",[@"\nMIN,,,,,,"  stringByAppendingString:lowerString],[@"\nMAX,,,,,,"  stringByAppendingString:upperString],[@"\nUNIT,,,,,," stringByAppendingString:unitString]];
     }
     
     return testItems;

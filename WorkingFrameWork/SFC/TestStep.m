@@ -10,7 +10,7 @@
 
 
 @interface TestStep (){
-    Lock                   *  _lock;
+    Lock*  _lock;
     
 }
 @end
@@ -23,10 +23,6 @@ static TestStep* test=nil;
 @synthesize strSN=_strSN;
 @synthesize strErrorMessage=_strErrorMessage;
 @synthesize timeDate=_timeDate;
-
-
-
-
 
 
 -(id)init
