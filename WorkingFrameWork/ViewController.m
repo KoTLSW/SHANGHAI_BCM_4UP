@@ -271,7 +271,6 @@ NSString * param_Name = @"Param";
     [self createThreadWithNum:3];
     [self createThreadWithNum:4];
 
-    
     //是否绑定过
     if ([[NSUserDefaults standardUserDefaults] objectForKey:@"IsBind"]) {
         thread = [[NSThread alloc] initWithTarget:self selector:@selector(Working) object:nil];
@@ -467,7 +466,6 @@ NSString * param_Name = @"Param";
                     
                     fixtureID = [[fixtureID componentsSeparatedByString:@"\r\n"] objectAtIndex:1];
                     fixtureID = [fixtureID stringByReplacingOccurrencesOfString:@"*_*" withString:@""];
-            
                 }
                 sfcManager.station_id = fixtureID;
                 
@@ -1086,6 +1084,14 @@ NSString * param_Name = @"Param";
                     index = 105;
                     NSLog(@"A====%d",testnum);
                 }
+                
+                
+                //上传PDCA
+                if (![notiString_A containsString:@"X"]&&isUpLoadPDCA==YES) {
+                    
+                    [pdca UploadPDCA_Dafen:1 Dic:A_resultDic Arr:itemArr1 BOOL:[notiString_A containsString:@"P"]?YES:NO];
+                }
+
             }
             else
             {
@@ -1195,11 +1201,10 @@ NSString * param_Name = @"Param";
             }
             else
             {
-                
                 //上传PDCA
                 if (![notiString_D containsString:@"X"]&&isUpLoadPDCA==YES) {
                     
-                        [pdca UploadPDCA_Dafen:4 Dic:D_resultDic Arr:itemArr1 BOOL:[notiString_D containsString:@"P"]?YES:NO];
+                    [pdca UploadPDCA_Dafen:4 Dic:D_resultDic Arr:itemArr1 BOOL:[notiString_D containsString:@"P"]?YES:NO];
                 }
                 
                 [self LightAndShowResultWithFix:notiString_D TestingFixStr:testingFixStr Dictionary:D_resultDic];

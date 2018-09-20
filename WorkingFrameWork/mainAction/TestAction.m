@@ -900,8 +900,6 @@ NSString  *param_path=@"Param";
                 
                 NSLog(@"item_index:%d=======testitem.testName:%@=========testvalue:%@",item_index,testitem.testName,testvalue);
             }
-
-            
         }
         else
         {
@@ -925,7 +923,6 @@ NSString  *param_path=@"Param";
         }
         else //空测试情况
         {
-            
             double Cdut,Cfix,Rdut;
             NSString *smallCap=@"<1fF";
             NSString *largeACR=@">100GOhm";
@@ -1328,8 +1325,10 @@ NSString  *param_path=@"Param";
         }
         
         //DCR为负值，超过量程，Rdut显示1001
-        //DCR为正值，DCR-Rfix>0,Rdut显示-999
+        //DCR为正值，DCR-Rfix>0,Rdut显示-999,提示空测
         //DCR为正值, DCR-Rfix<0,正常计算
+        //          Rdut>1000时，显示1001
+        //          0<Rdut<1000时，正常计算
         
         if (num*1E-9<0) {
            
@@ -1345,7 +1344,6 @@ NSString  *param_path=@"Param";
             {
                 if (Rdut >=1000)
                 {
-                    
                     [store_Dic setValue:[NSString stringWithFormat:@"%@",@"1001"] forKey:@"H109_BC_ISOLATION_R_DC"];
                 }
                 if (Rdut<1000&&Rdut>0) {

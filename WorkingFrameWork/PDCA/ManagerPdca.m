@@ -212,7 +212,7 @@
     task = [[NSTask alloc] init];
     [task setLaunchPath:@"/bin/sh"];
     
-    NSString  * folder =  [dic objectForKey:@"totalPath"];
+    NSString   * folder =  [dic objectForKey:@"totalPath"];
     NSString   * eachCsvDir =  [dic objectForKey:@"eachCsvDir"];
     NSString   * zipFileName = [[eachCsvDir componentsSeparatedByString:@"/"] lastObject];
     
@@ -248,6 +248,8 @@
             }
         }
     }
+    
+    NSLog(@"打印数据zipFileName1=%@====ZIP_path=%@",zipFileName1,ZIP_path);
     
      IP_addBlob(UID, [zipFileName1 cStringUsingEncoding:1], [ZIP_path cStringUsingEncoding:1]);
     //============================压缩文件======================================/

@@ -44,8 +44,8 @@
 		04A424261FA71E4500838C6F /* FileCSV.m in Sources */ = {isa = PBXBuildFile; fileRef = 04A4241E1FA71E4500838C6F /* FileCSV.m */; };
 		04A424271FA71E4500838C6F /* FileTXT.m in Sources */ = {isa = PBXBuildFile; fileRef = 04A424201FA71E4500838C6F /* FileTXT.m */; };
 		04A424281FA71E4500838C6F /* Folder.m in Sources */ = {isa = PBXBuildFile; fileRef = 04A424221FA71E4500838C6F /* Folder.m */; };
-		04B8D1232078A40F00E2A46A /* ManagerPdca.m in Sources */ = {isa = PBXBuildFile; fileRef = 04B8D1222078A40F00E2A46A /* ManagerPdca.m */; };
 		3D599D8C1FA9D0730023F29F /* PDCA.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D599D881FA9D0730023F29F /* PDCA.m */; };
+		5011D53321265258000E74C8 /* ManagerPdca.m in Sources */ = {isa = PBXBuildFile; fileRef = 5011D53221265258000E74C8 /* ManagerPdca.m */; };
 		5B13F3E420157F63004C14AE /* Station_Cr_1_Humid.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B13F3D820157F63004C14AE /* Station_Cr_1_Humid.plist */; };
 		5B13F3E620157F63004C14AE /* Station_Cr_2_Humid.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B13F3DA20157F63004C14AE /* Station_Cr_2_Humid.plist */; };
 		5B13F3E820157F63004C14AE /* Station_Cr_3_Humid.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B13F3DC20157F63004C14AE /* Station_Cr_3_Humid.plist */; };
@@ -123,8 +123,6 @@
 		04A424201FA71E4500838C6F /* FileTXT.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FileTXT.m; sourceTree = "<group>"; };
 		04A424211FA71E4500838C6F /* Folder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Folder.h; sourceTree = "<group>"; };
 		04A424221FA71E4500838C6F /* Folder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Folder.m; sourceTree = "<group>"; };
-		04B8D1212078A40F00E2A46A /* ManagerPdca.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ManagerPdca.h; sourceTree = "<group>"; };
-		04B8D1222078A40F00E2A46A /* ManagerPdca.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ManagerPdca.m; sourceTree = "<group>"; };
 		3D599D7E1FA9990C0023F29F /* VISA.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = VISA.framework; sourceTree = "<group>"; };
 		3D599D811FA9D0730023F29F /* CBAuth_API.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBAuth_API.h; sourceTree = "<group>"; };
 		3D599D821FA9D0730023F29F /* InstantPudding_API.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InstantPudding_API.h; sourceTree = "<group>"; };
@@ -134,6 +132,8 @@
 		3D599D971FAA15F90023F29F /* libCBAuth.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libCBAuth.dylib; sourceTree = "<group>"; };
 		3D599D981FAA15F90023F29F /* libInstantPudding.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libInstantPudding.dylib; sourceTree = "<group>"; };
 		3D599D991FAA15F90023F29F /* libIPSFCPost.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libIPSFCPost.dylib; sourceTree = "<group>"; };
+		5011D53121265258000E74C8 /* ManagerPdca.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ManagerPdca.h; sourceTree = "<group>"; };
+		5011D53221265258000E74C8 /* ManagerPdca.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ManagerPdca.m; sourceTree = "<group>"; };
 		5B13F3D820157F63004C14AE /* Station_Cr_1_Humid.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Station_Cr_1_Humid.plist; sourceTree = "<group>"; };
 		5B13F3DA20157F63004C14AE /* Station_Cr_2_Humid.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Station_Cr_2_Humid.plist; sourceTree = "<group>"; };
 		5B13F3DC20157F63004C14AE /* Station_Cr_3_Humid.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Station_Cr_3_Humid.plist; sourceTree = "<group>"; };
@@ -392,8 +392,8 @@
 				3D599D971FAA15F90023F29F /* libCBAuth.dylib */,
 				3D599D981FAA15F90023F29F /* libInstantPudding.dylib */,
 				3D599D991FAA15F90023F29F /* libIPSFCPost.dylib */,
-				04B8D1212078A40F00E2A46A /* ManagerPdca.h */,
-				04B8D1222078A40F00E2A46A /* ManagerPdca.m */,
+				5011D53121265258000E74C8 /* ManagerPdca.h */,
+				5011D53221265258000E74C8 /* ManagerPdca.m */,
 			);
 			path = PDCA;
 			sourceTree = "<group>";
@@ -495,6 +495,7 @@
 				04A424021FA4610500838C6F /* TimeDate.m in Sources */,
 				04A424261FA71E4500838C6F /* FileCSV.m in Sources */,
 				04A424281FA71E4500838C6F /* Folder.m in Sources */,
+				5011D53321265258000E74C8 /* ManagerPdca.m in Sources */,
 				3D599D8C1FA9D0730023F29F /* PDCA.m in Sources */,
 				0410A90F204C05700080F745 /* UpdateItem.m in Sources */,
 				04A423BD1FA3670000838C6F /* Plist.m in Sources */,
@@ -516,7 +517,6 @@
 				04A423B61FA3613B00838C6F /* Table.m in Sources */,
 				04A423A01FA360D500838C6F /* AppDelegate.m in Sources */,
 				040493151FBABE4E000A7330 /* SerialPortList.m in Sources */,
-				04B8D1232078A40F00E2A46A /* ManagerPdca.m in Sources */,
 				04A424001FA4610500838C6F /* MKCountDownTimer.m in Sources */,
 				040CAE92204FE3DC00572160 /* TestStep.m in Sources */,
 				04A423C51FA36D9E00838C6F /* TestAction.m in Sources */,
@@ -541,7 +541,9 @@
 		04A423AD1FA360D500838C6F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				"ADDITIONAL_SDKS[arch=*]" = "";
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
@@ -578,7 +580,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = macosx;
+				SDKROOT = macosx10.11;
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-8";
 			};
 			name = Debug;
@@ -586,7 +588,9 @@
 		04A423AE1FA360D500838C6F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				"ADDITIONAL_SDKS[arch=*]" = "";
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
@@ -616,7 +620,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				SDKROOT = macosx;
+				SDKROOT = macosx10.11;
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-8";
 			};
 			name = Release;
@@ -645,7 +649,7 @@
 				OTHER_LDFLAGS = "-all_load";
 				PRODUCT_BUNDLE_IDENTIFIER = Ab.BCM;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx10.12;
+				SDKROOT = macosx10.11;
 			};
 			name = Debug;
 		};
@@ -673,7 +677,7 @@
 				OTHER_LDFLAGS = "-all_load";
 				PRODUCT_BUNDLE_IDENTIFIER = Ab.BCM;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx10.12;
+				SDKROOT = macosx10.11;
 			};
 			name = Release;
 		};
