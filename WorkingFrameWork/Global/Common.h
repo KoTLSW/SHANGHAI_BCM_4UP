@@ -71,6 +71,7 @@
 
 //空测试完
 #define kFinshNullTestNotice                @"FinshNullTestNotice"
+#define kDifferNullTestNotice               @"kDifferNullTestNotice"
 
 //仪器有故障
 #define kInStrumentNotice                   @"InStrumentNotice"

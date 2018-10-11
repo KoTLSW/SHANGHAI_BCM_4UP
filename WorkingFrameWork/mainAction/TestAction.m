@@ -7,6 +7,8 @@
 //
 
 #import "TestAction.h"
+#import "Alert.h"
+#import "AppDelegate.h"
 
 
 
@@ -111,6 +113,9 @@ NSString  *param_path=@"Param";
     
     //新增加测试时时的Log值
     NSString            * testLogPath;                           //生成的时时LOG值
+    NSString            * deviation;                             //偏差
+    NSMutableArray      * RfixArray;                             //5次测量的大电阻参考值
+    Alert               * alert;
 
    
     
@@ -128,14 +133,13 @@ NSString  *param_path=@"Param";
 
 -(id)initWithTable:(Table *)tab withFixParam:(Param *)param withType:(int)type_num
 {
-    
     isDebug      = param.isDebug;
+    deviation    = param.deviation;
+    alert        = [Alert shareInstance];
 
     if (self == [super init]) {
         
-        
         singleFloder = param.SingleFolder;
-        
         NSDictionary  * fix;
         if (type_num == 1) fix = param.Fix1;
         if (type_num == 2) fix = param.Fix2;
@@ -181,6 +185,7 @@ NSString  *param_path=@"Param";
         store_Dic = [[NSMutableDictionary alloc] initWithCapacity:10];
         testAppendString    = [[NSMutableString alloc] initWithCapacity:10];
         testResultAppendStr = [[NSMutableString alloc] initWithCapacity:10];
+        RfixArray           = [[NSMutableArray alloc] initWithCapacity:10];
         
     
         //初始化各种串口
@@ -225,6 +230,7 @@ NSString  *param_path=@"Param";
 
         //监听公司名称的变化
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(selectCompanyNotice:) name:kTestCompanyNotice object:nil];
+    
         
         //获取全局变量
         thread = [[NSThread alloc]initWithTarget:self selector:@selector(TestAction) object:nil];
@@ -877,14 +883,19 @@ NSString  *param_path=@"Param";
                      testvalue = [NSString stringWithFormat:@"%.3f",num*1E-9];
                     if ([testitem.testName isEqualToString:@"H203_BC_B4_E4_DCR_X"]&&[testvalue floatValue]<0) {
                         
-                       testvalue = @"999";
+                       testvalue = @"1001";
                     }
                     [self storeValueToDic_with_name:testitem.testName];
                 }
-                
             }
             else//空测试的情况
             {
+                
+                if (isDebug) {
+                    num = [[NSString stringWithFormat:@"%u00000000000",arc4random()%3] doubleValue];
+                }
+
+                
                 double Rfixture   = num*1E-9;
                 
                 if([testitem.testName isEqualToString:@"H203_BC_B4_E4_DCR_X"])
@@ -1205,36 +1216,58 @@ NSString  *param_path=@"Param";
 }
 
 
+#pragma mark 写入plist文件中
 -(void)writeNullValueToPlist:(NSNotification *)noti
 {
+    
+//1.差值异常，直接退出重新测试
+//2.测试值OK，重新退出
+//3.次数比较少，直接提示重新空测
+    
+    //获取数组中最大与最小的差值与平均值得%x进行判断
+    if ([self getDifferValue:RfixArray withPercent:[deviation floatValue]]) {
+        nullTimes = 0;
+        B4_E4_Sum = 0;
+        Cap_Sum   = 0;
+        [RfixArray removeAllObjects];
+        [alert ShowCancelAlert:[NSString stringWithFormat:@"第%d穴空测值差值超过%@,请重新空测",fix_type,deviation] Window:[NSApplication sharedApplication].keyWindow];
+        [[NSNotificationCenter defaultCenter] postNotificationName:kDifferNullTestNotice object:nil];
+        return;
+    }
+    
+    
     updateItem.fix_B_E_Res     = [NSString stringWithFormat:@"%f",B_E_Sum/nullTimes];
     updateItem.fix_B2_E2_Res   = [NSString stringWithFormat:@"%f",B2_E2_Sum/nullTimes];
     updateItem.fix_B4_E4_Res   = [NSString stringWithFormat:@"%f",B4_E4_Sum/nullTimes];
     updateItem.fix_ABC_DEF_Res = [NSString stringWithFormat:@"%f",ABC_DEF_Sum/nullTimes];
     updateItem.fix_Cap         = [NSString stringWithFormat:@"%f",Cap_Sum/nullTimes];
     
+    
     if (fix_type == 1&&nullTimes>=2) {
         [plist PlistWrite:@"Param" UpdateItem:updateItem Key:kFixtureFix1];
-         NSLog(@"%d-----%@==%@===%@===%@===%@",fix_type,updateItem.fix_ABC_DEF_Res,updateItem.fix_B2_E2_Res,updateItem.fix_B4_E4_Res,updateItem.fix_B_E_Res,updateItem.fix_Cap);
+        NSLog(@"%d-----%@==%@===%@===%@===%@",fix_type,updateItem.fix_ABC_DEF_Res,updateItem.fix_B2_E2_Res,updateItem.fix_B4_E4_Res,updateItem.fix_B_E_Res,updateItem.fix_Cap);
     }
     if (fix_type==2&&nullTimes>=2) {
         [plist PlistWrite:@"Param" UpdateItem:updateItem Key:kFixtureFix2];
-         NSLog(@"%d-----%@==%@===%@===%@===%@",fix_type,updateItem.fix_ABC_DEF_Res,updateItem.fix_B2_E2_Res,updateItem.fix_B4_E4_Res,updateItem.fix_B_E_Res,updateItem.fix_Cap);
+        NSLog(@"%d-----%@==%@===%@===%@===%@",fix_type,updateItem.fix_ABC_DEF_Res,updateItem.fix_B2_E2_Res,updateItem.fix_B4_E4_Res,updateItem.fix_B_E_Res,updateItem.fix_Cap);
     }
     if (fix_type==3&&nullTimes>=2) {
         [plist PlistWrite:@"Param" UpdateItem:updateItem Key:kFixtureFix3];
-         NSLog(@"%d-----%@==%@===%@===%@===%@",fix_type,updateItem.fix_ABC_DEF_Res,updateItem.fix_B2_E2_Res,updateItem.fix_B4_E4_Res,updateItem.fix_B_E_Res,updateItem.fix_Cap);
+        NSLog(@"%d-----%@==%@===%@===%@===%@",fix_type,updateItem.fix_ABC_DEF_Res,updateItem.fix_B2_E2_Res,updateItem.fix_B4_E4_Res,updateItem.fix_B_E_Res,updateItem.fix_Cap);
     }
     if (fix_type==4&&nullTimes>=2) {
         [plist PlistWrite:@"Param" UpdateItem:updateItem Key:kFixtureFix4];
-         NSLog(@"%d-----%@==%@===%@===%@===%@",fix_type,updateItem.fix_ABC_DEF_Res,updateItem.fix_B2_E2_Res,updateItem.fix_B4_E4_Res,updateItem.fix_B_E_Res,updateItem.fix_Cap);
+        NSLog(@"%d-----%@==%@===%@===%@===%@",fix_type,updateItem.fix_ABC_DEF_Res,updateItem.fix_B2_E2_Res,updateItem.fix_B4_E4_Res,updateItem.fix_B_E_Res,updateItem.fix_Cap);
     }
     
     [agilentB2987A CloseDevice];
     [agilentE4980A CloseDevice];
-    //空测试完
-    [[NSNotificationCenter defaultCenter] postNotificationName:kFinshNullTestNotice object:nil];
     
+    //数据清空
+    B4_E4_Sum = 0;
+    nullTimes = 0;
+    [[NSNotificationCenter defaultCenter] postNotificationName:kFinshNullTestNotice object:nil];
+
 }
 
 
@@ -1268,11 +1301,14 @@ NSString  *param_path=@"Param";
 #pragma mark-----------------多次测试和的值
 -(void)add_RFixture_Value_To_Sum_Testname:(NSString *)testname RFixture:(double)RFixture
 {
-    NSString *largeRes= @">1TOhm";
+    NSString *largeRes= @"1001";
     if ([testname isEqualToString:@"B_E_DCR"])                   B_E_Sum   = B_E_Sum + fabs(RFixture);
     if ([testname isEqualToString:@"B2_E2_DCR"])                 B2_E2_Sum = B2_E2_Sum + fabs(RFixture);
     if ([testname isEqualToString:@"H203_BC_B4_E4_DCR_X"])       B4_E4_Sum = B4_E4_Sum + fabs(RFixture);
     if ([testname isEqualToString:@"ABC_DEF_DCR"])               ABC_DEF_Sum =ABC_DEF_Sum + fabs(RFixture);
+    
+    //加入数组中
+    [RfixArray addObject:[NSString stringWithFormat:@"%f",RFixture]];
     
     
     if ([testname isEqualToString:@"H203_BC_B4_E4_DCR_X"]) {
@@ -1320,39 +1356,31 @@ NSString  *param_path=@"Param";
     if ([testname isEqualToString:@"H203_BC_B4_E4_DCR_X"]) {
         
         //提示空测
-        if (num*1E-9 >= Rfixture) {
-            self.isShow = YES;
-        }
-        
         //DCR为负值，超过量程，Rdut显示1001
         //DCR为正值，DCR-Rfix>0,Rdut显示-999,提示空测
         //DCR为正值, DCR-Rfix<0,正常计算
         //          Rdut>1000时，显示1001
         //          0<Rdut<1000时，正常计算
         
-        if (num*1E-9<0) {
-           
-            [store_Dic setValue:[NSString stringWithFormat:@"%@",@"1001"] forKey:@"H109_BC_ISOLATION_R_DC"];
+        if (num*1E-9>1000||num*1E-9<0||Rdut >=1000) {
+            
+            [store_Dic setValue:[NSString stringWithFormat:@"%@",largeRes] forKey:@"H109_BC_ISOLATION_R_DC"];
         }
         else
         {
             if (num*1E-9>=Rfixture) {
                 
-                 [store_Dic setValue:[NSString stringWithFormat:@"%@",@"-999"] forKey:@"H109_BC_ISOLATION_R_DC"];
+                [store_Dic setValue:[NSString stringWithFormat:@"%@",@"-999"] forKey:@"H109_BC_ISOLATION_R_DC"];
+                self.isShow = YES;
             }
             else
             {
-                if (Rdut >=1000)
-                {
-                    [store_Dic setValue:[NSString stringWithFormat:@"%@",@"1001"] forKey:@"H109_BC_ISOLATION_R_DC"];
-                }
-                if (Rdut<1000&&Rdut>0) {
-                    [store_Dic setValue:[NSString stringWithFormat:@"%f",Rdut] forKey:@"H109_BC_ISOLATION_R_DC"];
-                }
+                [store_Dic setValue:[NSString stringWithFormat:@"%f",Rdut] forKey:@"H109_BC_ISOLATION_R_DC"];
             }
-            
         }
+        
         [store_Dic setValue:[NSString stringWithFormat:@"%.3f",Rfixture] forKey:@"H204_BC_B4_E4_DCR_Rfix_X"];
+    
         
     }
     else
@@ -1527,6 +1555,36 @@ NSString  *param_path=@"Param";
 }
 
 
+#pragma mark 获取数组中最大值和最小值的偏差
+-(BOOL)getDifferValue:(NSArray *)array withPercent:(float)percent
+{
+    
+    double  max = [[array valueForKeyPath:@"@max.doubleValue"] doubleValue];
+    double  min = [[array valueForKeyPath:@"@min.doubleValue"] doubleValue];
+    double  arv = [[array valueForKeyPath:@"@avg.doubleValue"] doubleValue];
+    
+    //如果percent<=1,则按比例计算；如果>=1,则按照数值计算
+     NSLog(@"差值%f==均值=%f====%f",max-min,arv,percent);
+    if (percent< 1) {
+        
+        if ((max-min)>arv*percent) {
+            return YES;
+        }
+        return NO;
+    }
+    else
+    {
+        if (max-min>percent) {
+            return YES;
+        }
+        else
+        {
+            return NO;
+        }
+    }
+    
+   
+}
 
 
 

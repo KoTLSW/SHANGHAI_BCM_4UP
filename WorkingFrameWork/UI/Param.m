@@ -37,10 +37,6 @@
     
     //s_build
     self.s_build               =[dictionary objectForKey:@"s_build"];
-
-    //扫描枪读取
-    self.scanDeivce            =[dictionary objectForKey:@"scanDeivce"];
-    self.scanDeivce_baud       =[[dictionary objectForKey:@"scanDeivce_baud"] integerValue] ;
     
     //获取数据
     self.contollerBoard        =[dictionary objectForKey:@"contollerBoard"];
@@ -57,6 +53,9 @@
     //文件夹的路径
     self.foldDir               =[dictionary objectForKey:@"foldDir"];
     self.SingleFolder          =[dictionary objectForKey:@"SingleFolder"];
+    
+    //偏差
+    self.deviation             =[dictionary objectForKey:@"deviation"];
     
     
 }

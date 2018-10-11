@@ -179,12 +179,9 @@ NSString * param_Name = @"Param";
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    //测试区
-
-    
     
     //整型变量定义区
-    index    = 0;
+    index    = 3;
     passNum  = 0;
     totalNum = 0;
     nullNum  = 0;
@@ -262,6 +259,8 @@ NSString * param_Name = @"Param";
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(selectSfc_PDCAUpload:) name:kPdcaUploadNotice object:nil];
     //监测空测试完
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(selectFinshNullTest) name:kFinshNullTestNotice object:nil];
+    //监测空测值异常
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(selectDifferNullTest) name:kDifferNullTestNotice object:nil];
     
     
     
@@ -280,7 +279,7 @@ NSString * param_Name = @"Param";
 
 
 
-#pragma mark=======================改变测试条件
+#pragma mark 改变测试条件
 
 - (IBAction)change_Station_Button:(id)sender {
     
@@ -309,7 +308,7 @@ NSString * param_Name = @"Param";
 }
 
 
-#pragma mark=======================保存配置文件的状态
+#pragma mark 保存配置文件的状态
 -(void)saveConfigStation
 {
     [config_Dic setValue: NestID_Change.titleOfSelectedItem forKey:kProductNestID];
@@ -319,7 +318,7 @@ NSString * param_Name = @"Param";
 }
 
 
-#pragma mark=======================开始测试
+#pragma mark 开始测试
 - (IBAction)start_Action:(id)sender
 {
     
@@ -354,7 +353,7 @@ NSString * param_Name = @"Param";
 
 
 
-#pragma mark=======================通道测试完成通知
+#pragma mark 通道测试完成通知
 //=============================================
 -(void)selectSnChangeNoti:(NSNotification *)noti
 {
@@ -425,8 +424,7 @@ NSString * param_Name = @"Param";
     
     while ([[NSThread currentThread] isCancelled]==NO) //线程未结束一直处于循环状态
     {
-        
-#pragma mark-------------//index = 0,初始化控制板串口
+#pragma mark index = 0,初始化控制板串口
         if (index == 0) {
             
             
@@ -504,9 +502,7 @@ NSString * param_Name = @"Param";
                 [self UpdateTextView:@"index = 0,控制板打开失败" andClear:NO andTextView:Log_View];
             }
         }
-        
-        
-#pragma mark-------------//index=1,初始化温湿度板子
+#pragma mark index=1,初始化温湿度板子
         if (index == 1) {
             
                       
@@ -601,11 +597,8 @@ NSString * param_Name = @"Param";
                 index = 2;
             }
         }
-        
-
-#pragma mark-------------//index = 2,请选择测试项
-        if (index == 2)
-        {
+#pragma mark index = 2,请选择测试项
+        if (index == 2){
               index = 3;
             
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -613,9 +606,7 @@ NSString * param_Name = @"Param";
                 [Status_TF setStringValue:@"index = 3,开始检测SN"];
             });
         }
-        
-        
-#pragma mark-------------//index = 3,检测SN1的输入值
+#pragma mark index = 3,检测SN1的输入值
         if (index == 3) {
             
             [NSThread sleepForTimeInterval:0.5];
@@ -690,8 +681,7 @@ NSString * param_Name = @"Param";
             }
             
         }
-        
-#pragma mark-------------//index = 4,检测SN2的输入值
+#pragma mark index = 4,检测SN2的输入值
         if (index == 4) {
             
             [NSThread sleepForTimeInterval:0.5];
@@ -768,8 +758,7 @@ NSString * param_Name = @"Param";
                 action2.isTest = YES;
             }
         }
-        
-#pragma mark-------------//index = 5,检测SN3的输入值
+#pragma mark index = 5,检测SN3的输入值
         if (index == 5) {
             
             [NSThread sleepForTimeInterval:0.5];
@@ -846,9 +835,7 @@ NSString * param_Name = @"Param";
             
             
         }
-        
-#pragma mark-------------//index = 6,检测SN4的输入值
-        
+#pragma mark index = 6,检测SN4的输入值
         if (index == 6) {
             
             [NSThread sleepForTimeInterval:0.5];
@@ -921,10 +908,7 @@ NSString * param_Name = @"Param";
             }
             
         }
-        
-        
-    
-#pragma mark------------//index=7,判断当前配置文件和changeID等配置
+#pragma mark index=7,判断当前配置文件和changeID等配置
         if (index == 7) { //判断当前配置文件和changeID等配置
             
             [NSThread sleepForTimeInterval:0.3];
@@ -981,9 +965,7 @@ NSString * param_Name = @"Param";
                 index = 1000;
             }
         }
-        
-        
-#pragma mark-------------//index=8,双击start按钮/或者点击界面上的start按钮
+#pragma mark index=8,双击start按钮/或者点击界面上的start按钮
         if (index == 8) {
             
             [NSThread sleepForTimeInterval:0.5];
@@ -1024,11 +1006,8 @@ NSString * param_Name = @"Param";
                 [self UpdateTextView:@"Start NG,请启动" andClear:NO andTextView:Log_View];
             }
         }
-
-        
- #pragma mark-------------//index=9,发送开始测试的通知
-        if (index == 9)
-        {
+ #pragma mark index=9,发送开始测试的通知
+        if (index == 9){
             
             //给SN赋值
             action1.dut_sn = NS_TF1.stringValue;
@@ -1059,9 +1038,7 @@ NSString * param_Name = @"Param";
             index = 1000;
     
         }
-        
-        
-#pragma mark-------------//index=101,A治具测试结束，发送指令信号灯
+#pragma mark index=101,A治具测试结束，发送指令信号灯
         if (fix_A_num == 101) {
             
             [NSThread sleepForTimeInterval:0.3];
@@ -1106,9 +1083,7 @@ NSString * param_Name = @"Param";
             }
             
         }
-        
-        
-#pragma mark-------------//index=102,B治具测试结束，发送指令信号灯
+#pragma mark index=102,B治具测试结束，发送指令信号灯
         if (fix_B_num == 102) {
             
             [NSThread sleepForTimeInterval:0.3];
@@ -1147,8 +1122,7 @@ NSString * param_Name = @"Param";
            
             
         }
-        
-#pragma mark-------------//index=103,C治具测试结束，发送指令信号灯
+#pragma mark index=103,C治具测试结束，发送指令信号灯
         if (fix_C_num == 103) {
             
             [NSThread sleepForTimeInterval:0.3];
@@ -1181,9 +1155,7 @@ NSString * param_Name = @"Param";
                 [self LightAndShowResultWithFix:notiString_C TestingFixStr:testingFixStr Dictionary:C_resultDic];
             }
         }
-        
-        
-#pragma mark-------------//index=104,C治具测试结束，发送指令信号灯
+#pragma mark  index=104,C治具测试结束，发送指令信号灯
         if (fix_D_num == 104) { //扫描SN
             
             [NSThread sleepForTimeInterval:0.3];
@@ -1212,8 +1184,7 @@ NSString * param_Name = @"Param";
             }
             
         }
-  
-#pragma mark-------------//index=105,所有测试结束
+#pragma mark index=105,所有测试结束
         if (index == 105) {
             
             [NSThread sleepForTimeInterval:0.5];
@@ -1272,23 +1243,16 @@ NSString * param_Name = @"Param";
             float temp_value = fabsf([[[NSUserDefaults standardUserDefaults] objectForKey:kTemp] floatValue]-[[config_Dic objectForKey:kTemp] floatValue]);
             float humit_value =fabsf([[[NSUserDefaults standardUserDefaults] objectForKey:kHumit] floatValue]-[[config_Dic objectForKey:kHumit] floatValue]);
             
-        NSLog(@"temp_value=%f,humit_value=%f,action1.isShow=%hhd,action1.isShow=%hhd,action1.isShow=%hhd,action1.isShow=%hhd",temp_value,humit_value,action1.isShow,action2.isShow,action3.isShow,action4.isShow);
-            
             if (nulltest_button.hidden&&(temp_value>20||humit_value>20||action1.isShow||action2.isShow||action3.isShow||action4.isShow)) {
                 //释放各种串口，端口
                 if (action1!=nil)[action1 threadEnd];
                 if (action2!=nil)[action2 threadEnd];
                 if (action3!=nil)[action3 threadEnd];
                 if (action4!=nil)[action4 threadEnd];
-                [alert ShowCancelAlert:@"注意:温湿度变化过大，请重新空测"];
+                [alert ShowCancelAlert:@"注意:温湿度变化过大，请重新空测" Window:[NSApplication sharedApplication].keyWindow];
             }
             
-            
-            if (singleTest) {
-                
-                 index = 1;
-            }
-            else if (isLoopTest)
+            if (isLoopTest)
             {
                 
                 index = 7;
@@ -1297,25 +1261,18 @@ NSString * param_Name = @"Param";
             {
                 index = 1;
             }
-            
-            
-
         }
-        
-#pragma mark-------------//index=1000,测试结束
+#pragma mark index=1000,测试结束
         if (index == 1000) { //等待测试结束，并返回测试的结果
             [NSThread sleepForTimeInterval:0.001];
         }
-        
-
-   
     }
     
     
 }
 
 
-#pragma mark====================测试模式:空测，单测，循环
+#pragma mark 测试模式:空测，单测，循环
 -(void)selectTestModeNotice:(NSNotification *)noti
 {
         //空测
@@ -1378,7 +1335,7 @@ NSString * param_Name = @"Param";
 
 }
 
-#pragma mark----------监听SFC和PDCA的上传状态
+#pragma mark 监听SFC和PDCA的上传状态
 -(void)selectSfc_PDCAUpload:(NSNotification *) noti
 {
     if ([noti.name isEqualToString:kPdcaUploadNotice]) {
@@ -1432,20 +1389,37 @@ NSString * param_Name = @"Param";
 
 
 
-#pragma mark====================空测试结束，退出软件
+#pragma mark 空测试结束，退出软件
 -(void)selectFinshNullTest
 {
-    
     //将当前温湿度的数值存储在本地
     [[NSUserDefaults standardUserDefaults] setValue:[config_Dic objectForKey:kHumit] forKey:kHumit];
     [[NSUserDefaults standardUserDefaults] setValue:[config_Dic objectForKey:kTemp]  forKey:kTemp];
     [[NSUserDefaults standardUserDefaults] synchronize];
-
-    nullNum++;
-    if (nullNum == 4) {
+    
+    if(!(action1.isShow||action2.isShow||action3.isShow||action3.isShow))
+    {
+        nullNum++;
         
-        exit(0);
+        if (nullNum == 4) {
+            
+            exit(0);
+        }
     }
+    
+}
+
+
+#pragma mark 刷新界面数据
+-(void)selectDifferNullTest
+{
+    passNum = 0;
+    totalNum = 0;
+    nullNum  = 0;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        
+         [TestCount_TF setStringValue:@"0/0"];
+    });
 }
 
 
@@ -1457,7 +1431,7 @@ NSString * param_Name = @"Param";
 }
 
 
-#pragma mark====================确认选项
+#pragma mark 确认选项
 - (IBAction)makesureDut:(id)sender {
 
     singlebutton.state = NO;
@@ -1546,7 +1520,7 @@ NSString * param_Name = @"Param";
 }
 
 
-#pragma mark====================选择测试项
+#pragma mark 选择测试项
 - (IBAction)single_test:(id)sender {
     
     if (singlebutton.state) {
@@ -1653,7 +1627,7 @@ NSString * param_Name = @"Param";
 }
 
 
-#pragma mark----------------生成线程
+#pragma mark 生成线程
 -(void)createThreadWithNum:(int)num
 {
     
@@ -1698,7 +1672,7 @@ NSString * param_Name = @"Param";
 }
 
 
-#pragma mark---------------释放仪器仪表
+#pragma mark 释放仪器仪表
 -(void)viewWillDisappear
 {
 
@@ -1731,11 +1705,7 @@ NSString * param_Name = @"Param";
 }
 
 
-
-
-
-
-#pragma mark---------------正常测试时，数据校验
+#pragma mark 正常测试时，数据校验
 -(void)compareSNToServerwithTextField:(NSTextField *)tf Index:(int)testIndex SnIndex:(int)snIndex
 {
    
@@ -1779,7 +1749,7 @@ NSString * param_Name = @"Param";
 }
 
 
-#pragma mark---------------正常测试时，无SFC请求时
+#pragma mark 正常测试时，无SFC请求时
 -(void)ShowcompareNumwithTextField:(NSTextField *)tf Index:(int)testIndex SnIndex:(int)snIndex
 {
     
@@ -1803,7 +1773,7 @@ NSString * param_Name = @"Param";
 }
 
 
-#pragma mark--------------点亮指示灯，并显示测试的结果
+#pragma mark 点亮指示灯，并显示测试的结果
 -(void)LightAndShowResultWithFix:(NSString *)notiString TestingFixStr:(NSString *)testingFix Dictionary:(NSDictionary *)resultDic
 {
     
@@ -1896,8 +1866,6 @@ NSString * param_Name = @"Param";
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 
 }
-
-
 
 
 - (void)setRepresentedObject:(id)representedObject {

@@ -44,8 +44,6 @@
 @property(nonatomic,strong)NSDictionary  * Fix2;
 @property(nonatomic,strong)NSDictionary  * Fix3;
 @property(nonatomic,strong)NSDictionary  * Fix4;
-@property(nonatomic,strong)NSString      * scanDeivce;
-@property(nonatomic,assign)NSInteger       scanDeivce_baud;
 
 
 //18/03/05    板子控制器
@@ -56,6 +54,8 @@
 //18/03/26
 @property(nonatomic,strong)NSString      * SingleFolder;
 
+//18/09/19
+@property(nonatomic,strong)NSString      * deviation;
 
 
 //=============================================

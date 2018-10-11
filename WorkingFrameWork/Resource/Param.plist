@@ -127,23 +127,17 @@
 	<string>/dev/cu.usbserial-EW-HUMIT</string>
 	<key>isDebug</key>
 	<false/>
-	<key>reading_borad</key>
-	<string>/dev/cu.usbserial-read</string>
-	<key>reading_uart_baud</key>
-	<string>9600</string>
-	<key>scanDeivce</key>
-	<string>/dev/cu.usbserial-scan</string>
-	<key>scanDeivce_baud</key>
-	<string>9600</string>
 	<key>sw_name</key>
 	<string>BCM_OQC_Station</string>
 	<key>sw_ver</key>
-	<string>V2.1.7GD</string>
+	<string>V2.1.72GD</string>
 	<key>waveFrequence</key>
 	<string>1000</string>
 	<key>waveOffset</key>
 	<string>0</string>
 	<key>waveVolt</key>
 	<string>0.8</string>
+	<key>deviation</key>
+	<string>0.2</string>
 </dict>
 </plist>

@@ -46,6 +46,7 @@
 		04A424281FA71E4500838C6F /* Folder.m in Sources */ = {isa = PBXBuildFile; fileRef = 04A424221FA71E4500838C6F /* Folder.m */; };
 		3D599D8C1FA9D0730023F29F /* PDCA.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D599D881FA9D0730023F29F /* PDCA.m */; };
 		5011D53321265258000E74C8 /* ManagerPdca.m in Sources */ = {isa = PBXBuildFile; fileRef = 5011D53221265258000E74C8 /* ManagerPdca.m */; };
+		5023B421215392CE006BD8E8 /* 版本需求.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 5023B420215392CE006BD8E8 /* 版本需求.rtf */; };
 		5B13F3E420157F63004C14AE /* Station_Cr_1_Humid.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B13F3D820157F63004C14AE /* Station_Cr_1_Humid.plist */; };
 		5B13F3E620157F63004C14AE /* Station_Cr_2_Humid.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B13F3DA20157F63004C14AE /* Station_Cr_2_Humid.plist */; };
 		5B13F3E820157F63004C14AE /* Station_Cr_3_Humid.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B13F3DC20157F63004C14AE /* Station_Cr_3_Humid.plist */; };
@@ -134,6 +135,7 @@
 		3D599D991FAA15F90023F29F /* libIPSFCPost.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libIPSFCPost.dylib; sourceTree = "<group>"; };
 		5011D53121265258000E74C8 /* ManagerPdca.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ManagerPdca.h; sourceTree = "<group>"; };
 		5011D53221265258000E74C8 /* ManagerPdca.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ManagerPdca.m; sourceTree = "<group>"; };
+		5023B420215392CE006BD8E8 /* 版本需求.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = "版本需求.rtf"; sourceTree = "<group>"; };
 		5B13F3D820157F63004C14AE /* Station_Cr_1_Humid.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Station_Cr_1_Humid.plist; sourceTree = "<group>"; };
 		5B13F3DA20157F63004C14AE /* Station_Cr_2_Humid.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Station_Cr_2_Humid.plist; sourceTree = "<group>"; };
 		5B13F3DC20157F63004C14AE /* Station_Cr_3_Humid.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Station_Cr_3_Humid.plist; sourceTree = "<group>"; };
@@ -304,6 +306,7 @@
 				5B13F3DA20157F63004C14AE /* Station_Cr_2_Humid.plist */,
 				5B13F3DC20157F63004C14AE /* Station_Cr_3_Humid.plist */,
 				04A423DD1FA40D7F00838C6F /* Param.plist */,
+				5023B420215392CE006BD8E8 /* 版本需求.rtf */,
 			);
 			path = Resource;
 			sourceTree = "<group>";
@@ -474,6 +477,7 @@
 				04A423B71FA3613B00838C6F /* Table.xib in Resources */,
 				5B13F3E420157F63004C14AE /* Station_Cr_1_Humid.plist in Resources */,
 				04A423A81FA360D500838C6F /* Assets.xcassets in Resources */,
+				5023B421215392CE006BD8E8 /* 版本需求.rtf in Resources */,
 				04A423AB1FA360D500838C6F /* Main.storyboard in Resources */,
 				040739B720635604002A8B16 /* FileConfigSet.xib in Resources */,
 				5B13F3E820157F63004C14AE /* Station_Cr_3_Humid.plist in Resources */,

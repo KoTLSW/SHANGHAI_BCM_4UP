@@ -51,39 +51,15 @@ static Alert * SharedInstance = nil;
     dispatch_async(dispatch_get_main_queue(), ^{
     
         NSAlert *alert = [NSAlert new];
-        alert.messageText = @"OK";
-        alert.informativeText = message;
+        alert.messageText = @"提示信息:";
+        alert.informativeText = [NSString stringWithFormat:@"             \n             %@",message];
         [alert addButtonWithTitle:@"确定"];
         
-        //第一种方式，以modal的方式出现
-        [alert runModal];
-        
-       
-        
         //第二种方式，以sheet的方式出现
-        
-//        [alert beginSheetModalForWindow:window completionHandler:^(NSInteger result) {
-//         
-//            if (result==NSAlertFirstButtonReturn) {
-//                
-//            }
-//            else if(result==NSAlertSecondButtonReturn)
-//            {
-//            
-//            }
-//            else if(result==NSAlertThirdButtonReturn)
-//            {
-//            
-//            
-//            }
-//            else
-//            {
-//                NSLog(@"Application exit");
-//                //退出app
-//                exit(0);
-//            
-//            }
-//        }];
+        [alert beginSheetModalForWindow:window completionHandler:^(NSModalResponse returnCode) {
+            NSLog(@"alert 展示完毕");
+           //exit(0);
+        }];
         
     });
 }
@@ -101,7 +77,7 @@ static Alert * SharedInstance = nil;
         
         //第一种方式，以modal的方式出现
         [alert runModal];
-         exit(0);
+//         exit(0);
         
     });
 }
