@@ -50,6 +50,7 @@
 
 
 @property(nonatomic,strong)NSString     * fixture_uart_port_name;//治具名称
+@property(nonatomic,strong)NSString     * fixture_uart_port_name_two;//治具名称
 @property(nonatomic,strong)NSString     * fixture_uart_baud;     //治具波特率
 @property(nonatomic,strong)NSString     * instrument_name;       //仿真仪器名称
 @property(nonatomic,strong)NSString     * instrument_baud;       //仿真仪器波特率

@@ -26,6 +26,7 @@
     
     //温湿度传感器
     self.humiture_uart_port_name=[dictionary objectForKey:@"humiture_uart_port_name"];
+    self.humiture_uart_port_name_two = [dictionary objectForKey:@"humiture_uart_port_name_two"];
     self.humiture_uart_baud     =[[dictionary objectForKey:@"humiture__uart_baud"] integerValue];
     
     
@@ -40,6 +41,7 @@
     
     //获取数据
     self.contollerBoard        =[dictionary objectForKey:@"contollerBoard"];
+    self.contollerBoard_two    =[dictionary objectForKey:@"contollerBoard_two"];
     self.contollerBoard_uart_baud = [dictionary objectForKey:@"contollerBoard_uart_baud"];
     
     

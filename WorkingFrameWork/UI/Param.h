@@ -25,6 +25,7 @@
 
 //温湿度传感器相关
 @property(readwrite,copy)NSString*  humiture_uart_port_name;
+@property(readwrite,copy)NSString*  humiture_uart_port_name_two;
 @property(readwrite)NSInteger       humiture_uart_baud;
 //是否需要波形发生器
 @property(nonatomic,assign)BOOL isDebug;
@@ -49,6 +50,7 @@
 //18/03/05    板子控制器
 @property(nonatomic,strong)NSString      * Freq;
 @property(nonatomic,strong)NSString      * contollerBoard;
+@property(nonatomic,strong)NSString      * contollerBoard_two;
 @property(nonatomic,strong)NSString      * contollerBoard_uart_baud;
 
 //18/03/26

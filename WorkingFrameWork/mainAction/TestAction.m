@@ -149,6 +149,7 @@ NSString  *param_path=@"Param";
         
         //初始化各种数据及其设备消息
         self.fixture_uart_port_name = [fix objectForKey:@"fixture_uart_port_name"];
+        self.fixture_uart_port_name_two = [fix objectForKey:@"fixture_uart_port_name_two"];
         self.fixture_uart_baud      = [fix objectForKey:@"fixture_uart_baud"];
         self.instr_2987             = [fix objectForKey:@"b2987_adress"];
         self.instr_4980             = [fix objectForKey:@"e4980_adress"];
@@ -263,7 +264,7 @@ NSString  *param_path=@"Param";
             else
             {
                 [self writeTestLog:fix_type withString:[NSString stringWithFormat:@"index=%d,fixture start connect",index]];
-                BOOL isCollect = [serialport Open:self.fixture_uart_port_name];
+                BOOL isCollect = [serialport Open:self.fixture_uart_port_name]||[serialport Open:self.fixture_uart_port_name_two];
                 if (isCollect) {
                      //发送指令获取ID的值
                      [self writeTestLog:fix_type withString:[NSString stringWithFormat:@"index=%d,fixture connect success",index]];
@@ -282,6 +283,16 @@ NSString  *param_path=@"Param";
                      NSLog(@"index= 0,连接治具%@",self.fixture_uart_port_name);
                      [self UpdateTextView:@"index=0,治具已经连接" andClear:NO andTextView:self.Log_View];
                     
+                }
+                else{
+                    
+                    NSLog(@"index= 0,连接治具%@",self.fixture_uart_port_name);
+                    if (![self.Log_View.textStorage.string containsString:@"index=0,治具连接失败"]) {
+                        
+                         [self UpdateTextView:@"index=0,治具连接失败" andClear:NO andTextView:self.Log_View];
+                    }
+                   
+                
                 }
             }
         }
@@ -342,8 +353,15 @@ NSString  *param_path=@"Param";
                 {
                     [self UpdateTextView:@"index=1,测试仪器已连接" andClear:NO andTextView:self.Log_View];
                     [self writeTestLog:fix_type withString:[NSString stringWithFormat:@"index=%d,Instrument Connect success",index]];
-                    
                     Instrument = YES;
+                }else{
+                    
+                    if (![self.Log_View.textStorage.string containsString:@"index=1,仪器仪表连接失败"]) {
+                        
+                        [self UpdateTextView:@"index=1,仪器仪表连接失败" andClear:NO andTextView:self.Log_View];
+                    }
+
+                
                 }
             }
         }

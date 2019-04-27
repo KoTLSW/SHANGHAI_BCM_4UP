@@ -181,7 +181,7 @@ NSString * param_Name = @"Param";
     [super viewDidLoad];
     
     //整型变量定义区
-    index    = 3;
+    index    = 0;
     passNum  = 0;
     totalNum = 0;
     nullNum  = 0;
@@ -430,7 +430,7 @@ NSString * param_Name = @"Param";
             
             [NSThread sleepForTimeInterval:0.5];
             
-            BOOL  isOpen = [serialport Open:param.contollerBoard];
+            BOOL  isOpen = [serialport Open:param.contollerBoard]||[serialport Open:param.contollerBoard_two];
             
             if (param.isDebug)
             {
@@ -519,12 +519,14 @@ NSString * param_Name = @"Param";
             }
             else if (!humiturePort.IsOpen)
             {
-                 BOOL  isOpen = [humiturePort Open:param.humiture_uart_port_name];
+                 BOOL  isOpen = [humiturePort Open:param.humiture_uart_port_name]||[humiturePort Open:param.humiture_uart_port_name_two];
+                
                  if (isOpen) {
                      
                     dispatch_async(dispatch_get_main_queue(), ^{
                         [Status_TF setStringValue:@"index=1,Humiture connect success"];
                     });
+                    [self UpdateTextView:@"index=1:温湿度连接成功" andClear:NO andTextView:Log_View];
                      
                      
                     //获取温湿度的值
@@ -549,12 +551,10 @@ NSString * param_Name = @"Param";
                          [config_Dic setValue:[arr[1] stringByReplacingOccurrencesOfString:@"%" withString:@""] forKey:kHumit];
                          [config_Dic setValue:arr[0] forKey:kTemp];
                          [self UpdateTextView:@"index = 1,温湿度连接成功" andClear:NO andTextView:Log_View];
-                         
-                          index = 2;
+                         index = 2;
                      }
 
-                     
-                   
+
                 }
                 else
                 {
@@ -591,10 +591,12 @@ NSString * param_Name = @"Param";
                     //存储温湿度
                     [config_Dic setValue:arr[0] forKey:kTemp];
                     [config_Dic setValue:[arr[1] stringByReplacingOccurrencesOfString:@"%" withString:@""] forKey:kHumit];
+                    
+                     index = 2;
                 
                 }
                 
-                index = 2;
+            
             }
         }
 #pragma mark index = 2,请选择测试项
@@ -680,6 +682,9 @@ NSString * param_Name = @"Param";
                 action1.isTest = YES;
             }
             
+            //读取下串口数据
+            [serialport ReadExisting];
+            
         }
 #pragma mark index = 4,检测SN2的输入值
         if (index == 4) {
@@ -746,17 +751,16 @@ NSString * param_Name = @"Param";
                 }
                 else
                 {
-                     [self ShowcompareNumwithTextField:NS_TF2 Index:4 SnIndex:2];
+                      [self ShowcompareNumwithTextField:NS_TF2 Index:4 SnIndex:2];
                     
-                    if ([NS_TF2.stringValue length] == [num_PopButton.titleOfSelectedItem intValue]) {
-                        
-                        index = index  + 2;
-                    }
                 }
                 
                 //action2.dut_sn = NS_TF2.stringValue;
                 action2.isTest = YES;
             }
+            //读取下串口数据
+            [serialport ReadExisting];
+            
         }
 #pragma mark index = 5,检测SN3的输入值
         if (index == 5) {
@@ -831,8 +835,8 @@ NSString * param_Name = @"Param";
                 //action3.dut_sn = NS_TF3.stringValue;
                 action3.isTest = YES;
             }
-            
-            
+            //读取下串口数据
+            [serialport ReadExisting];
             
         }
 #pragma mark index = 6,检测SN4的输入值
@@ -907,6 +911,10 @@ NSString * param_Name = @"Param";
                  action4.isTest = YES;
             }
             
+            //读取下串口数据
+            [serialport ReadExisting];
+            
+            
         }
 #pragma mark index=7,判断当前配置文件和changeID等配置
         if (index == 7) { //判断当前配置文件和changeID等配置
@@ -914,7 +922,6 @@ NSString * param_Name = @"Param";
             [NSThread sleepForTimeInterval:0.3];
             [self saveConfigStation];
 
-            
             if (config_change.state) {
                 
                 NSLog(@"Please cancell Config Button");
@@ -1204,10 +1211,7 @@ NSString * param_Name = @"Param";
                          [Status_TF setStringValue:@"治具复位OK"];
                      });
                 }
-                
-                
             }
-            
             
             dispatch_async(dispatch_get_main_queue(), ^{
                 

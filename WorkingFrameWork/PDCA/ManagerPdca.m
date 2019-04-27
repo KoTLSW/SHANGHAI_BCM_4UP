@@ -40,125 +40,56 @@
 
 
 
-#pragma mark----PDCA相关
-//================================================
-//上传pdca
-//================================================
--(void)UploadPDCA:(int)num Dic:(NSDictionary *)dic
+#pragma mark----PDCA相关----卡站UOP
+-(NSString *)SFC_CheckSN:(NSString *)Sn WithStationID:(NSString *)station_id
 {
-    //可以从json文件中获取所需要的值
-    NSError  * error;
-    NSData  * data=[NSData dataWithContentsOfFile:@"/vault/data_collection/test_station_config/gh_station_info.json"];
-    NSDictionary * jsonDic=[[NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:&error] objectForKey:@"ghinfo"];
-    NSString * ReStaName =[jsonDic objectForKey:@"STATION_TYPE"];
+    IP_UUTHandle UID;
+    IP_API_Reply IP_REPLY;
     
+    //开始UUTStart
+    IP_REPLY = IP_UUTStart(&UID);
     
-    
-    NSString * result=  @"";
-    NSString * value =  @"";
-    
-    BOOL pass_fail = YES;
-    
-    
-    dut_sn =  [dic objectForKey:@"dut_sn"];
-    
-    if ([dut_sn length]>17) {
-        
-        dut_sn = [dut_sn substringToIndex:17];
+    if (!IP_success(IP_REPLY)) {
+        const char*initInfo = " ";
+        initInfo = IP_reply_getError(IP_REPLY);
+        NSString* strErr= [NSString stringWithFormat:@"Error: IP_UUTStart: %@", [NSString stringWithUTF8String:initInfo]];
+        IP_UUTCancel(UID);
+        return strErr;
     }
-    [pdca PDCA_Init:dut_sn SW_name:ReStaName SW_ver:[dic objectForKey:@"sw_ver"]];           //上传sn，sw_name,sw_ver
     
-    NSArray   * itemArr = [dic objectForKey:@"dic"];
-    
-    for(int i=0;i<[itemArr count];i++)
+    //在PDCA服务器中查询当前SN
+    IP_API_Reply reply =  IP_addAttribute(UID, IP_ATTRIBUTE_STATIONIDENTIFIER, [station_id UTF8String] );//Set Station ID to “DFU-NAND-INIT”
+    if (IP_success(reply)== false) {
+        NSLog(@"IP_amIOkay_reply fail");
+        NSLog(@"Message:%@", @(IP_reply_getError(reply)));
+        return NO;
+    }
+    else
     {
-        Item *testitem=itemArr[i];
-        if (num == 1) {result = testitem.result1,value   = testitem.value1;}
-        if (num == 2) {result = testitem.result2,value   = testitem.value2;}
-        if (num == 3) {result = testitem.result3,value   = testitem.value3;}
-        if (num == 4) {result = testitem.result4,value   = testitem.value4;}
-        
-        
-        if(testitem.isTest)  //需要测试的才需要上传
-        {
-            
-            if((testitem.isShow == YES)&&(testitem.isTest))    //需要显示并且需要测试的才上传
-            {
-
-                if(![result isEqualToString:@"PASS"])
-                {
-                    pass_fail = NO;
-                    
-                }
-                
-                [pdca PDCA_UploadValue:testitem.testName
-                                 Lower:testitem.min
-                                 Upper:testitem.max
-                                  Unit:testitem.units
-                                 Value:value
-                             Pass_Fail:pass_fail];
-                
-            }
-        }
+        NSLog(@"IP_amIOkay_reply OK");
+        NSLog(@"Message:%@", @(IP_reply_getError(reply)));
     }
-    
-    [pdca PDCA_Upload:pass_fail];     //上传汇总结果
-    
-    //============================压缩文件======================================/
-    NSTask *task;
-    task = [[NSTask alloc] init];
-    [task setLaunchPath:@"/bin/sh"];
-
-     NSString  * folder =  [dic objectForKey:@"totalPath"];
-     NSString   * eachCsvDir =  [dic objectForKey:@"eachCsvDir"];
-     NSString   * zipFileName = [[eachCsvDir componentsSeparatedByString:@"/"] lastObject];
-    
-    
-    NSString   * zipFileName1 =[[NSString stringWithFormat:@"%@_%@",param.sw_name,param.sw_ver] stringByAppendingString:@"_ZIP_Log"];
-    
-     NSString   * cmd = [NSString stringWithFormat:@"cd %@; zip -r %@.zip %@",folder,zipFileName,zipFileName];
-     NSArray    * argument = [NSArray arrayWithObjects:@"-c", [NSString stringWithFormat:@"%@", cmd], nil];
-     [task setArguments: argument];
-    
-    NSPipe *pipe;
-    pipe = [NSPipe pipe];
-    [task setStandardOutput: pipe];
-    
-    [task launch];
-    
-    //获取压缩文件的具体地址
-    NSString *ZIP_path = [NSString stringWithFormat:@"%@/%@.zip",folder,zipFileName];
-    sleep(1);
-    int FileCount = 0;
-    while (true) {
-        if([[NSFileManager defaultManager] fileExistsAtPath:ZIP_path]){
-            NSLog(@"file has been existed");
-            break;
-        }
-        else
-        {
-            NSLog(@"file has been not existed");
-            FileCount++;
-            sleep(0.5);
-            if (FileCount>=3) {
-                break;
-            }
-        }
+    usleep(300000);
+    IP_API_Reply doneReply = IP_amIOkay(UID, [Sn UTF8String]);//Query to the process control system
+    if (IP_success( doneReply ) == false)
+    {
+        NSLog(@"IP_amIOkay_doneReply fail");
+        NSString  * backstring = @(IP_reply_getError(doneReply));
+        NSLog(@"Message:%@", backstring);
+        return backstring;
     }
-    
-    //上传压缩文件到服务器
-    [pdca AddBlob:zipFileName1 FilePath:ZIP_path];
-    
-    //上传结束时间
-    [pdca PDCA_GetEndTime];
-    
-    //============================压缩文件======================================/
+    else
+    {   NSLog(@"IP_amIOkay_doneReply OK");
+        NSLog(@"Message:%@", @(IP_reply_getError(doneReply)));
+        IP_reply_destroy(IP_UUTDone(UID));
+        IP_reply_destroy(doneReply);
+        return @"PASS";
+    }
 }
 
 
 
-
-
+#pragma mark----UploadPDCA_Dafe
 -(void)UploadPDCA_Dafen:(int)num Dic:(NSDictionary *)dic Arr:(NSArray *)array BOOL:(BOOL)isPass
 {
     /**
